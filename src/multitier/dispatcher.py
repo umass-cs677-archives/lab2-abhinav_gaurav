@@ -16,21 +16,25 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
     '''Multi-Threaded Database HTTP Server to handle several client requests
        concurrently.
     '''
-    def __init__(self, *args, **kwargs):
-        multi_thread_server.MultiThreadedHTTPServer.__init__(self, *args, **kwargs)
+    def __init__(self, server_addr, handler_cls, front_end_server_cls, db_ip, db_port):
+        multi_thread_server.MultiThreadedHTTPServer.__init__(self, server_addr, handler_cls)
         self.n_servers = 10
         self.server_port = 7000
         self.server_ip = "127.0.0.1"
-        self.create_front_end_servers (self.n_servers, self.server_ip, self.server_port)
         self.mutex = threading.RLock ()
-        
+        self.front_end_server_cls = front_end_server_cls
+        self.db_ip = db_ip
+        self.db_port = db_port
+
+        self.create_front_end_servers (self.n_servers, self.server_ip, self.server_port)
+
     def create_front_end_servers (self, number, server_ip, port):
         self.servers = {} #Dictionary of Server addresses and number of clients associated with them
         for i in range (0, number):
             print "Starting server %d at "%number, server_ip, port
-            server, th = multi_thread_server.create_and_run_server (front_end_server.FrontEndHTTPServer,
+            server, th = multi_thread_server.create_and_run_server (self.front_end_server_cls,
                                                        multi_thread_server.ServerRequestHandler, port,
-                                                       "127.0.0.1", "6000")
+                                                       self.db_ip, str(self.db_port))
             full_address = self.server_ip + ":" + str(port)
             port += 1
             self.servers [full_address] = 0

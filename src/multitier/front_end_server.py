@@ -1,5 +1,5 @@
 import sys
-sys.path.insert (0, "../")
+#sys.path.insert (0, "../")
 
 import utils
 import json
@@ -9,12 +9,11 @@ import prwlock
 import time
 import multi_thread_server 
 
-class FrontEndHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
+class FrontEndHTTPServer():
     '''Multi-Threaded Database HTTP Server to handle several client requests
        concurrently.
     '''
-    def __init__(self, server_address, handler_class, database_ip, database_port):
-        multi_thread_server.MultiThreadedHTTPServer.__init__(self, server_address, handler_class)
+    def __init__(self, database_ip, database_port):
         self.database_server_address = utils.create_address (database_ip, database_port)
         self.number_of_clients = 0
     

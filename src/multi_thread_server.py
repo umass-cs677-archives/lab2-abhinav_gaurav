@@ -231,28 +231,30 @@ def parse_command_line_args (desc):
     parser.add_argument('-p', '--port', type=int, help='Port number', required=True)
     return parser.parse_args()
 
-def main (serverclass):
+def set_sigint_handler (httpd):
+    import sys
     
-    args = parse_command_line_args("Server")
-    httpd = create_server(serverclass, ServerRequestHandler, args.port)
-
     def signal_handler(signal, frame):
-        '''Signal handler for SIGINT. Joins all request threads and 
+        '''Signal handler for SIGINT. Joins all request threads and
            close server socket before exiting.
         '''
         print "Shutting down server"
-        print "Number of pushupdate requests made", httpd.n_push_requests
-        if httpd.n_push_requests != 0:
-            print "Time taken to handle each push request", float(httpd.push_request_time)/httpd.n_push_requests
         httpd.join_all_threads()
         httpd.socket.close()
         sys.exit(0)
-        
+
     signal.signal(signal.SIGINT, signal_handler)
+
+def main (serverclass):
+    
+    cmdargs = parse_command_line_args("Server")
+    httpd = create_server(serverclass, ServerRequestHandler, cmdargs.port)
+    set_sigint_handler (httpd)
     
     print "Running HTTP Server"
     print "Press CTRL+C to exit"
     httpd.serve_forever()
-    
+
+
 if __name__ == "__main__":
     main (serverclass=MultiThreadedHTTPServer)

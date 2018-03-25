@@ -24,8 +24,9 @@ class LeaderElection():
             self.newElection()
 
     def coordinatorMessage(self, leader_addr):
-        r = requests.get(self.servers[(self.idx + 1) % len(self.servers)] + '/incrementMedalTally/%s' % (leader_addr))
-        obj = utils.check_response_for_failure(r.text)
+        print "I am the leader", leader_addr
+        # r = requests.get(self.servers[(self.idx + 1) % len(self.servers)] + '/incrementMedalTally/%s' % (leader_addr))
+        # obj = utils.check_response_for_failure(r.text)
 
     def newElection(self):
         r = requests.get( + '/passElection/%s/%s' % (self.id, self.load))
