@@ -3,20 +3,20 @@ import requests
 import time
 import random
 import utils
-
+import signal
 
 class Client():
     """
 
     """
 
-    def __init__(self, server_ip_address, server_port):
-        self.dispatcher_ip = server_ip_address
-        self.dispatcher_port = server_port
-        self.dispatcher_address = utils.create_address(server_ip_address, server_port)
+    def __init__(self, dispatcher_address, dispatcher_port):
+        self.dispatcher_ip = dispatcher_address
+        self.dispatcher_port = dispatcher_port
+        self.dispatcher_address = utils.create_address(dispatcher_address, dispatcher_port)
         self.server_address = ""
         self.periodic_running = False
-        self.sleeping_time = 5
+        self.sleeping_time = 1
         self.periodic_thread = None
         
     def getMedalTally(self, team, to_print=True):
@@ -41,7 +41,7 @@ class Client():
         
         r = requests.get(self.dispatcher_address + '/getServer')
         obj = utils.check_response_for_failure (r.text)
-        self.server_address = obj.server
+        self.server_address = "http://"+obj.server
         print "Server Address obtained", self.server_address
         
     def releaseServer(self):
@@ -120,11 +120,17 @@ class Client():
         while self.periodic_running:
             for team in utils.teams:
                 print "Getting Medal Tally for", team
-                self.getMedalTally(team)
+                try:
+                    self.getMedalTally(team)
+                except Exception as e:
+                    print e
             
             for event in utils.games:
-                print "Getting Score for", game
-                self.getScore(event)
+                print "Getting Score for", event
+                try:
+                    self.getScore(event)
+                except Exception as e:
+                    print e
             
             time.sleep (self.sleeping_time)
             
@@ -159,15 +165,15 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description='Client Pull')
-    parser.add_argument('--server_ip_addr', type=str, help='Server IP Address', required=True)
-    parser.add_argument('--server_port', type=int, help='Server port number', required=True)
+    parser.add_argument('--dispatcher_ip_addr', type=str, help='Dispatcher IP Address', required=True)
+    parser.add_argument('--dispatcher_port', type=int, help='Dispatcher port number', required=True)
     parser.add_argument('--num_requests', type=int, help='Number of requests')
     parser.add_argument('--request_delay', type=float, help='Time delay in requests')
     args = parser.parse_args()
 
-    server_ip_address = args.server_ip_addr
-    server_port = args.server_port
-    client = Client(server_ip_address, server_port)
+    dispatcher_ip_addr = args.dispatcher_ip_addr
+    dispatcher_port = args.dispatcher_port
+    client = Client(dispatcher_ip_addr, dispatcher_port)
 
     if args.num_requests is not None and args.request_delay is not None:
         try:
@@ -179,7 +185,7 @@ if __name__ == '__main__':
             print "Provide number of requests and delay parameter in integer with -evaluate"
             print e
 
-    client.periodic_do ()
+    client.start_periodic_do ()
     
     def signal_handler(signal, frame):
         '''Signal handler for SIGINT. Joins all request threads and 

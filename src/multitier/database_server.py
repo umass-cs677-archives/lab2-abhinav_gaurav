@@ -54,7 +54,7 @@ class DatabaseHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
     def query_score_by_game(self, game):
         if game not in utils.games:
             raise Exception("Invalid game '%s'" % game)
-
+        print "TODO: Write file if not there"
         lock = self.game_locks[game]
         with lock.reader_lock():
             sc = {team: self.teams[team].games[game] for team in self.teams}
