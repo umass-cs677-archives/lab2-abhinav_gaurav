@@ -3,8 +3,6 @@ sys.path.insert (0, "../")
 
 import utils
 import json
-import threading
-import urllib
 import requests
 import config
 import prwlock
