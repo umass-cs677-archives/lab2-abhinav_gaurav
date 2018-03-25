@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+import requests
+import server
+=======
 import sys
 sys.path.insert (0, "../")
 
@@ -10,6 +14,7 @@ import config
 import prwlock
 import time
 import multi_thread_server 
+>>>>>>> cdf39e6bb56c09fd8c774f4037818cb1e1e2a20a
 
 class FrontEndHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
     '''Multi-Threaded Database HTTP Server to handle several client requests
@@ -52,4 +57,3 @@ class FrontEndHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
                          '/update_score_by_game/%s/%s/%s/%s'%(eventType, romeScore, 
                                                   gaulScore, authID))
         return r.text
-        

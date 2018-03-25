@@ -3,7 +3,6 @@ import json
 import threading
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import urllib
-import requests
 import config
 import prwlock
 import time
