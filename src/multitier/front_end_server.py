@@ -1,11 +1,4 @@
-import utils
-import json
-import threading
-import urllib
 import requests
-import config
-import prwlock
-import time
 import server
 
 class FrontEndHTTPServer(server.MultiThreadedHTTPServer):
@@ -40,4 +33,3 @@ class FrontEndHTTPServer(server.MultiThreadedHTTPServer):
                          '/setScore/%s/%s/%s/%s'%(eventType, romeScore, 
                                                   gaulScore, authID))
         return r.text
-        

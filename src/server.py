@@ -3,10 +3,9 @@ import json
 import threading
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import urllib
-import requests
 import config
 import prwlock
-import time
+
 
 class ServerRequestHandler(BaseHTTPRequestHandler):
     def _set_headers(self):

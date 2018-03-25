@@ -1,13 +1,7 @@
 import utils
 import json
-import threading
-import urllib
-import requests
-import config
 import prwlock
-import time
 import server
-import database
 
 
 def write_data(fname, data):
