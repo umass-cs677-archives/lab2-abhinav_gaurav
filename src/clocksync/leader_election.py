@@ -58,8 +58,11 @@ class LeaderElection:
         loads = [int(args[x]) for x in range(sz/2, sz)]
 
         if self.id in ids:              # Time to find and elect leader
-            leader_idx = loads.index(min(loads))
-            self.coordinatorMessage(leader_addr=ids[leader_idx])
+            minm = min(loads)
+            indices = [i for i, x in enumerate(loads) if x == minm]
+            subset_ids = [ids[i] for i in indices]
+            leader_addr = min(subset_ids)
+            self.coordinatorMessage(leader_addr)
         else:                           # Pass on the message
             ids.append(self.id)
             loads.append(str(self.get_load()))
