@@ -95,6 +95,7 @@ class DatabaseHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         
         return json.dumps({"response":"success"})
 
+
 if __name__ == "__main__":
     import signal
     import argparse

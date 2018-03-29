@@ -9,10 +9,11 @@ class LeaderElection():
         '''
         :param id: Server Address
         '''
-        self.id = _id
-        self.load = 0               # TODO: check initialization and Lock needed. Never Decreases!!!
+        self.id = server_id
+                                    # TODO: check initialization and Lock needed. Never Decreases!!!
         self.servers = servers      # TODO: need to be initialized
         self.idx = servers.index(server_id)
+        self.next_server = self.servers[(self.idx + 1)%len(self.servers)]
 
     def perpetual_election(self):
         '''
@@ -29,7 +30,7 @@ class LeaderElection():
         # obj = utils.check_response_for_failure(r.text)
 
     def newElection(self):
-        r = requests.get( + '/passElection/%s/%s' % (self.id, self.load))
+        r = requests.get(self.next_server + '/passElection/%s/%s' % (self.id, self.get_load()))
         obj = utils.check_response_for_failure(r.text)
 
     def passElection(self, *args):
@@ -42,7 +43,7 @@ class LeaderElection():
         ids = [x for x in range(sz/2)]
         loads = [x for x in range(sz/2, l)]
 
-        if self.id in ids:              # Time to elect leader
+        if self.id in ids:              # Time to find and elect leader
             leader_idx = loads.index(min(loads))
             self.coordinatorMessage(leader_addr=self.servers[leader_idx])
         else:                           # Pass on the message
@@ -50,7 +51,7 @@ class LeaderElection():
             loads.append(self.load)
 
             arg = '/'.join(ids) + '/'.join(loads)
-            r = requests.get(self.servers[(self.idx + 1)%len(self.servers)] + '/incrementMedalTally/%s' % (arg))
+            r = requests.get(self.next_server + '/passElection/%s' % (arg))
             obj = utils.check_response_for_failure(r.text)
 
     def incrementLoad(self):
