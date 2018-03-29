@@ -1,8 +1,11 @@
+sys.path.insert (0, "../")
+
 import requests
 import time
 
 import config
 import utils
+
 
 class LeaderElection():
     def __init__(self, id, servers):
@@ -14,6 +17,7 @@ class LeaderElection():
         self.servers = servers      # TODO: need to be initialized
         self.idx = servers.index(id)
         self.next_server = self.servers[(self.idx + 1)%len(self.servers)]
+        utils.run_thread(self.perpetual_election)
 
     def get_load(self):
         pass
@@ -23,7 +27,7 @@ class LeaderElection():
         Runs on a thread perpetually. Purpose: Start Election.
         :return:
         '''
-        while True:
+        while True:                                     # TODO
             time.sleep(config.ELECTION_SNOOZE)
             self.newElection()
 
