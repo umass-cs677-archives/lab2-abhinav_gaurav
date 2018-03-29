@@ -5,14 +5,14 @@ import config
 import utils
 
 class LeaderElection():
-    def __init__(self, id, servers):
+    def __init__(self, server_id, servers):
         '''
         :param id: Server Address
         '''
-        self.id = id
+        self.id = _id
         self.load = 0               # TODO: check initialization and Lock needed. Never Decreases!!!
         self.servers = servers      # TODO: need to be initialized
-        self.idx = servers.index(id)
+        self.idx = servers.index(server_id)
 
     def perpetual_election(self):
         '''

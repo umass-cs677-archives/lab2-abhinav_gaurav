@@ -24,6 +24,9 @@ class FrontEndHTTPServer():
     def unregisterClient(self):
         self.number_of_clients -= 1
         return json.dumps({"response":"success"})
+    
+    def getLoad(self):
+        return self.number_of_clients
         
     def getMedalTally(self, teamName):
         r = requests.get(self.database_server_address + \
