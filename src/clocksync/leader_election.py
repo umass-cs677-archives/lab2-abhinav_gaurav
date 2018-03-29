@@ -8,19 +8,16 @@ import utils
 
 
 class LeaderElection():
-    def __init__(self, id, servers):
+    def __init__(self, server_id, servers):
         '''
         :param id: Server Address
         '''
-        self.id = id
-                                       # TODO: check initialization and Lock needed. Never Decreases!!!
+        self.id = server_id
+                                    # TODO: check initialization and Lock needed. Never Decreases!!!
         self.servers = servers      # TODO: need to be initialized
-        self.idx = servers.index(id)
+        self.idx = servers.index(server_id)
         self.next_server = self.servers[(self.idx + 1)%len(self.servers)]
         utils.run_thread(self.perpetual_election)
-
-    def get_load(self):
-        pass
 
     def perpetual_election(self):
         '''

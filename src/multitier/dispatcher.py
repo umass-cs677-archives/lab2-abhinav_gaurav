@@ -61,6 +61,8 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         
         if (minload_server == None):
             return json.dumps ({"response":"failure", "message":"Failed to get server, try again"})
+        r = requests.get ("http://"+minload_server+"/registerClient")
+        util.check_response_for_failure (r.text)
         return json.dumps ({"response":"success", "server":minload_server})
 
     def releaseServer (self, serveraddress):
@@ -76,6 +78,8 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         self.mutex.acquire ()
         try:        
             self.servers[serveraddress] -= 1
+            r = requests.get ("http://"+minload_server+"/unregisterClient")
+            util.check_response_for_failure (r.text)
         finally:
             self.mutex.release ()
         
