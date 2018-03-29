@@ -102,7 +102,7 @@ if __name__ == "__main__":
     import sys
     
     parser = argparse.ArgumentParser(description='Database Server')
-    parser.add_argument('-p', '--port', type=int, default=6000, help='Port number')
+    parser.add_argument('-p', '--port', type=int, default=000, help='Port number')
     args = parser.parse_args()
 
     httpd = multi_thread_server.create_server(DatabaseHTTPServer, 

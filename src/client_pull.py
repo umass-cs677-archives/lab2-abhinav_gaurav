@@ -38,7 +38,8 @@ class Client():
     def getServer(self):
         if (self.server_address != ""):
             return
-        
+
+        print "Getting server"
         r = requests.get(self.dispatcher_address + '/getServer')
         obj = utils.check_response_for_failure (r.text)
         self.server_address = "http://"+obj.server

@@ -16,16 +16,17 @@ class FrontEndHTTPServer():
     def __init__(self, database_ip, database_port):
         self.database_server_address = utils.create_address (database_ip, database_port)
         self.number_of_clients = 0
+
     
     def registerClient(self):
         self.number_of_clients += 1
-        return json.dumps({"response":"failure"})
+        return json.dumps({"response":"success"})
     
     def unregisterClient(self):
         self.number_of_clients -= 1
         return json.dumps({"response":"success"})
     
-    def getLoad(self):
+    def get_load(self):
         return self.number_of_clients
         
     def getMedalTally(self, teamName):
