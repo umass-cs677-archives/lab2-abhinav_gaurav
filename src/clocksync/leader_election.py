@@ -55,24 +55,17 @@ class LeaderElection:
             self.get_info()
         sz = len(args)
         ids = [args[x] for x in range(sz/2)]
-        loads = [args[x] for x in range(sz/2, sz)]
+        loads = [int(args[x]) for x in range(sz/2, sz)]
 
         if self.id in ids:              # Time to find and elect leader
             leader_idx = loads.index(min(loads))
-            self.coordinatorMessage(leader_addr=self.servers[leader_idx])
+            self.coordinatorMessage(leader_addr=ids[leader_idx])
         else:                           # Pass on the message
             ids.append(self.id)
             loads.append(str(self.get_load()))
 
-            arg = '/'.join(ids) + '/' + '/'.join(loads)
+            arg = '/'.join(ids) + '/' + '/'.join([str(load) for load in loads])
             r = requests.get('http://' + self.next_server + '/passElection/%s' % (arg))
             obj = utils.check_response_for_failure(r.text)
 
         return json.dumps({"response": "success"})
-
-    def incrementLoad(self):
-        '''
-        Dispatcher will update load on this server.
-        :return: Success
-        '''
-        self.load += 1
