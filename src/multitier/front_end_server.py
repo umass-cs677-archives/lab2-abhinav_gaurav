@@ -17,7 +17,6 @@ class FrontEndHTTPServer():
         self.database_server_address = utils.create_address (database_ip, database_port)
         self.number_of_clients = 0
 
-    
     def registerClient(self):
         self.number_of_clients += 1
         return json.dumps({"response":"success"})

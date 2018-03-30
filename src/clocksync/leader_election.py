@@ -3,11 +3,9 @@ sys.path.insert (0, "../")
 
 import requests
 import time
-
 import config
 import utils
 import json
-
 
 class LeaderElection:
     def __init__(self, server_id):
@@ -29,7 +27,6 @@ class LeaderElection:
         Runs on a thread perpetually. Purpose: Start Election.
         :return:
         '''
-
         while True:                                     # TODO
             time.sleep(config.ELECTION_SNOOZE)
             if not self.servers:
@@ -37,7 +34,11 @@ class LeaderElection:
             self.newElection()
 
     def coordinatorMessage(self, leader_addr):
-        print "I am the leader", leader_addr
+        if (leader_addr == self.id):
+            print "I am the leader", leader_addr
+            self.set_leader ()
+        else:
+            self.unset_leader ()
         # r = requests.get(self.servers[(self.idx + 1) % len(self.servers)] + '/incrementMedalTally/%s' % (leader_addr))
         # obj = utils.check_response_for_failure(r.text)
 

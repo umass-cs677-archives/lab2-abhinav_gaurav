@@ -2,9 +2,12 @@ from multi_thread_server import MultiThreadedHTTPServer, create_server, set_sigi
 from multitier.front_end_server import FrontEndHTTPServer
 from multitier.dispatcher import DispatcherHTTPServer
 from clocksync.leader_election import LeaderElection
+from clocksync.clock_sync import Clock
 import argparse
 import requests
 import utils
+
+################TODO: All functions that has to be defined in child class but not defined in parent has to be defined in parent with exception "Not Implemented"
 
 
 class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection):
@@ -13,15 +16,14 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
         FrontEndHTTPServer.__init__(self, database_ip, database_port)
         MultiThreadedHTTPServer.__init__(self, server_addr_port, handler_class)
         LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
+        Clock.__init__(self, 100)
 
     def get_all_servers(self):
         server_address = ':'.join(self.addr_port)
         r = requests.get('http://' + server_address + '/getAllServers/')    # TODO change to dispatcher port and addr
         obj = utils.check_response_for_failure(r.text)
-        print obj.servers
         return obj.servers
-
-
+    
 def main():
     parser = argparse.ArgumentParser(description="MuliThreadedFrontEndServer")
     parser.add_argument('--disp_port', type=int, default=config.DISPATCHER_PORT, help='Dispatcher Port number')
