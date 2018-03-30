@@ -16,7 +16,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
 
     def __init__(self, server_addr, handler_cls, front_end_server_cls, db_ip, db_port):
         multi_thread_server.MultiThreadedHTTPServer.__init__(self, server_addr, handler_cls)
-        self.n_servers = 10
+        self.n_servers = 3
         self.server_port = 7000
         self.server_ip = "127.0.0.1"
         self.mutex = threading.RLock()
