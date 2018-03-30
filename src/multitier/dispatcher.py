@@ -14,13 +14,16 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
        concurrently.
     '''
 
-    def __init__(self, server_addr, handler_cls, front_end_server_cls, db_ip, db_port):
+    def __init__(self, server_addr, handler_cls, front_end_server_cls, fes_port, db_ip, db_port):
         multi_thread_server.MultiThreadedHTTPServer.__init__(self, server_addr, handler_cls)
         self.n_servers = 10
-        self.server_port = 7000
-        self.server_ip = "127.0.0.1"
-        self.mutex = threading.RLock()
         self.front_end_server_cls = front_end_server_cls
+
+        self.server_ip = "127.0.0.1"            # TODO
+        self.server_port = fes_port
+
+        self.mutex = threading.RLock()
+
         self.db_ip = db_ip
         self.db_port = db_port
         self.servers = {}  # Dictionary of Server addresses and number of clients associated with them

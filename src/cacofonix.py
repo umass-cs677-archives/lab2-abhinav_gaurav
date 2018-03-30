@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Client Pull')
     parser.add_argument('--server_ip_addr', type=str, help='Server IP Address', required=True)
-    parser.add_argument('--server_port', type=int, help='Server port number', required=True)
+    parser.add_argument('--server_port', type=int, default=config.CACOFONIX_PORT, help='Server port number')
     parser.add_argument('--num_requests', type=int, help='Number of requests')
     parser.add_argument('--request_delay', type=float, help='Time delay in requests')
 

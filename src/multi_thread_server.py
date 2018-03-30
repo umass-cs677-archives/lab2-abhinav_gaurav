@@ -97,125 +97,12 @@ class MultiThreadedHTTPServer(HTTPServer):
 
         return (request_method, args)
 
-#~ class MultiThreadedHTTPServer(MultiThreadedHTTPServer):
-    #~ '''Mult-Threaded HTTP Server to handle several client requests
-       #~ concurrently.
-    #~ '''
-    #~ def __init__(self, *args, **kwargs):
-        #~ HTTPServer.__init__(self, *args, **kwargs)
-        #~   # utils.teams to utils.teams_names
-        #~ self.registered_clients = {}  # dictionary of eventType to list of registered clients
-        #~ self.authID = config.AUTH_ID
-        #~ self.rwlock = prwlock.RWLock()
-        #~ self.register_client_rwlock = prwlock.RWLock()
-        #~ self.__requests_thread = []
-        #~ self.push_request_time = 0
-        #~ self.n_push_requests = 0
-
-    #~ def registerClient(self, clientID, eventType):
-        #~ if eventType not in utils.games:
-            #~ raise Exception("Event '%s' not supported" % (eventType))
-        #~ with self.register_client_rwlock.writer_lock ():
-            #~ if eventType not in self.registered_clients:
-                #~ self.registered_clients[eventType] = []
-                
-            #~ self.registered_clients[eventType].append(clientID)
-            
-        #~ return json.dumps({"response":"success"})
-        
-    #~ def do_server_push(self, eventType):
-        #~ '''Called when score is set for a team and a game.
-           #~ Sends pushUpdate request to all registered clients.
-        #~ '''
-        #~ if eventType not in self.registered_clients:
-            #~ return
-        
-        #~ with self.rwlock.reader_lock():
-            #~ t1 = time.clock ()
-            #~ request_str = '/pushUpdate/' + eventType
-            #~ for team in self.teams:
-                #~ request_str += '/' + team + '/' + str(self.teams[team].games[eventType])
-
-            #~ for client in self.registered_clients[eventType]:
-                #~ r = requests.get('http://' + client + request_str)
-            
-            #~ t = time.clock () - t1
-            #~ self.push_request_time += t
-            #~ self.n_push_requests += 1
-            
-    #~ def get_medal_tally_by_game_by_team(self, team=None, game=None):
-        #~ with self.rwlock.reader_lock():
-            #~ return self.teams[team].games[game]
-
-    #~ def get_score_by_game(self, game):
-        #~ if game not in utils.games:
-            #~ raise Exception("Invalid game '%s'" % game)
-
-        #~ with self.rwlock.reader_lock():
-            #~ return {team: self.teams[team].games[game] for team in self.teams}
-
-    #~ def get_medal_tally_by_team(self, team):
-        #~ if team not in utils.teams:
-            #~ raise Exception("Invalid team '%s'" % team)
-
-        #~ with self.rwlock.reader_lock():
-            #~ return self.teams[team].medals
-
-    #~ def set_score_for_game_by_team(self, game, team, tally):
-        #~ if team not in utils.teams:
-            #~ raise Exception("Invalid team '%s'" % team)
-
-        #~ if game not in utils.games:
-            #~ raise Exception("Invalid game '%s'" % game)
-
-        #~ with self.rwlock.writer_lock():
-            #~ self.teams[team].games[game] = tally
-
-    #~ def check_authentication(self, authID):
-        #~ if (authID != self.authID):
-            #~ raise Exception("Authentication Failed '%s'" % authID)
-
-    #~ def set_score_by_game(self, game, tally_rome, tally_gaul, authID):
-        #~ self.check_authentication(authID)
-        #~ tallys = [tally_gaul, tally_rome]
-        #~ for idx, team in enumerate(utils.teams):
-            #~ self.set_score_for_game_by_team(game, team, int(tallys[idx]))
-        #~ self.do_server_push(game)
-
-    #~ def getMedalTally(self, teamName):
-        #~ medalTally = self.get_medal_tally_by_team(teamName)
-        #~ response = {"response": "success", "medals": medalTally}
-        #~ return json.dumps(response)
-
-    #~ def increment_medal_tally(self, teamName, medalType, authID):
-        #~ self.check_authentication(authID)
-
-        #~ if teamName not in utils.teams:
-            #~ raise Exception("Invalid team '%s'" % teamName)
-
-        #~ if medalType not in utils.medals:
-            #~ raise Exception("Invalid Medal: '%s'" %medalType)
-
-        #~ self.teams[teamName].medals[medalType] += 1
-
-    #~ def incrementMedalTally(self, teamName, medalType, authID):
-        #~ self.increment_medal_tally(teamName, medalType, authID)
-        #~ return json.dumps({"response": "success"})
-
-    #~ def getScore(self, eventType):
-        #~ sc = self.get_score_by_game(eventType)
-        #~ response = {"response": "success", "scores": sc}
-        #~ return json.dumps(response)
-
-    #~ def setScore(self, eventType, romeScore, gaulScore, authId):
-        #~ self.set_score_by_game(eventType, romeScore, gaulScore, authId)
-        #~ return json.dumps({"response": "success"})
-
 
 def create_server(server_class, handler_class, port, *args):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class, *args)
     return httpd
+
 
 def create_and_run_server(server_class, handler_class, port, *args):
     ''' Create and Run server in another thread.
@@ -226,10 +113,12 @@ def create_and_run_server(server_class, handler_class, port, *args):
     th = utils.run_thread (HTTPServer.serve_forever, httpd)
     return (httpd, th)
 
+
 def parse_command_line_args (desc):
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-p', '--port', type=int, help='Port number', required=True)
     return parser.parse_args()
+
 
 def set_sigint_handler (httpd):
     import sys
@@ -244,6 +133,7 @@ def set_sigint_handler (httpd):
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)
+
 
 def main (serverclass):
     
