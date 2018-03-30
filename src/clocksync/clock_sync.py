@@ -11,7 +11,7 @@ class Clock:
     self.rho = 5
     self._is_leader = False
     self.clock_sync_thread = None
-    self.servers = None
+    self.server_addresses = None
     self.clock_sync_lock = threading.RLock() #TODO: Use two different locks
     
   def get_current_time_offset (self):
@@ -40,12 +40,13 @@ class Clock:
     '''
     self.clock_sync_lock.acquire ()
     self.current_time_offset -= int(clock)
+    print "Setting new time offset of", self.id, " = ", self.current_time_offset, "changing offset with = ", clock
     self.clock_sync_lock.release ()
     return json.dumps({"response":"success"})
     
   def get_slave_times (self):
     self.slave_times = []
-    for addr in self._servers:
+    for addr in self.server_addresses:
       if addr != self.id:
         slave_time = self.get_clock_from_address (addr)
         self.slave_times.append (slave_time)
@@ -56,11 +57,13 @@ class Clock:
     return average_time
     
   def set_slave_times (self, average_time):
-    for addr in self._servers:
+    for addr in self.server_addresses:
       if addr != self.id:
         r = requests.get ("http://"+addr + "/setClock/"+str(average_time))
         utils.check_response_for_failure (r.text)
-  
+    
+    print "All slaves changed with offset", average_time
+    
   def set_leader (self):
     self._is_leader = True
     self.clock_sync_lock.acquire ()
@@ -70,15 +73,20 @@ class Clock:
     
   def perform_clock_sync (self):
     while self.is_leader():
-      #if (self.servers == None):
-      self._servers = ["127.0.0.1:7000","127.0.0.1:7001", "127.0.0.1:7002"]
-      self.set_slave_times(self.get_slave_times ())
+      if (self.server_addresses == None):
+        self.server_addresses = self.get_all_servers()
+      print self.server_addresses
+      self.set_slave_times(self.get_slave_times())
       time.sleep(self.delta/(2*self.rho))
       print "TODO: Do this periodically?"
+      
 
   def is_leader (self):
     return self._is_leader
   
+  def get_all_servers (self):
+    raise NotImplemented("Clock.get_all_servers not implemented")
+    
   def unset_leader (self):
     self._is_leader = False
     self.clock_sync_lock.acquire ()
