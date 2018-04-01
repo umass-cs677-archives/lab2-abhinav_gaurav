@@ -79,7 +79,6 @@ class Clock:
       self.set_slave_times(self.get_slave_times())
       time.sleep(self.delta/(2*self.rho))
       print "TODO: Do this periodically?"
-      
 
   def is_leader (self):
     return self._is_leader

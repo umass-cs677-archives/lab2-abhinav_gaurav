@@ -45,7 +45,7 @@ class LeaderElection:
     def newElection(self):
         r = requests.get('http://' + self.next_server + '/passElection/%s/%d' % (self.id, self.get_load()))
         obj = utils.check_response_for_failure(r.text)
-        
+
     def passElection(self, *args):
         '''
         An API for the first pass in the ring. Every server pushes it's load.
@@ -75,5 +75,7 @@ class LeaderElection:
         return json.dumps({"response": "success"})
     
     def get_all_servers (self):
-        raise NotImplemented("Clock.get_all_servers not implemented")
-    
+        raise NotImplemented("LeaderElection.get_all_servers not implemented")
+        
+    def get_load (self):
+        raise NotImplemented("LeaderElection.get_load not implemented")

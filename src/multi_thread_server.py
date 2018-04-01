@@ -67,11 +67,11 @@ class MultiThreadedHTTPServer(HTTPServer):
         
     def call_request_handler(self, path, request):
         
-        #try:
+        try:
             meth, args = self.parse_request_path(path)
             return meth(*args)
-        #except Exception as e:
-            #return json.dumps({"response": "failure", "message": str(e)})
+        except Exception as e:
+            return json.dumps({"response": "failure", "message": str(e)})
 
     def parse_request_path(self, path):
         '''Finds and the appropriate method for given request.

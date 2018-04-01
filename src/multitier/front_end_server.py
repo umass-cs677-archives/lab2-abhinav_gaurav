@@ -13,10 +13,11 @@ class FrontEndHTTPServer():
     '''Multi-Threaded Database HTTP Server to handle several client requests
        concurrently.
     '''
-    def __init__(self, database_ip, database_port):
+    def __init__(self, database_ip, database_port, disp_addr):
         self.database_server_address = utils.create_address (database_ip, database_port)
         self.number_of_clients = 0
-
+        self.disp_addr = disp_addr
+        
     def registerClient(self):
         self.number_of_clients += 1
         return json.dumps({"response":"success"})

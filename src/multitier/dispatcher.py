@@ -14,15 +14,16 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
        concurrently.
     '''
 
-    def __init__(self, server_addr, handler_cls, front_end_server_cls, fes_port, db_ip, db_port):
+    def __init__(self, server_addr, handler_cls, front_end_server_cls, fes_port, db_ip, db_port, ip):
         multi_thread_server.MultiThreadedHTTPServer.__init__(self, server_addr, handler_cls)
-        self.n_servers = 3
+        self.n_servers = 1 #TODO: command line args
         self.server_ip = "127.0.0.1"            # TODO
         self.server_port = fes_port
         self.mutex = threading.RLock()
         self.front_end_server_cls = front_end_server_cls
         self.db_ip = db_ip
         self.db_port = db_port
+        self.full_addr = ip+":"+str(server_addr[1])
         self.servers = {}  # Dictionary of Server addresses and number of clients associated with them
         self.create_front_end_servers(self.n_servers, self.server_ip, self.server_port)
 
@@ -31,7 +32,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             print "Starting server %d at " % number, server_ip, port
             server, th = multi_thread_server.create_and_run_server(self.front_end_server_cls,
                                                                    multi_thread_server.ServerRequestHandler, port,
-                                                                   self.db_ip, str(self.db_port))
+                                                                   self.db_ip, str(self.db_port), self.full_addr)
             full_address = self.server_ip + ":" + str(port)
             port += 1
             self.servers[full_address] = 0
@@ -83,7 +84,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         return json.dumps({"response": "success"})
 
     def getAllServers(self):
-        return json.dumps({"response": "success", "servers": list(self.servers.keys())})
+        return json.dumps({"response": "success", "servers": list(self.servers.keys()) + [self.db_ip+":"+str(self.db_port)]})
 
 
 if __name__ == "__main__":

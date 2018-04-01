@@ -31,17 +31,15 @@ def read_data(fname):
     return data
 
 
-class DatabaseHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
-    '''Multi-Threaded Database HTTP Server to handle several client requests
-       concurrently.
-    '''
-    def __init__(self, *args, **kwargs):
-        multi_thread_server.MultiThreadedHTTPServer.__init__(self, *args, **kwargs)
+class Database:
+    '''Database '''
+    def __init__(self):
         self.teams = {_team: team.Team(_team, utils.games) for _team in utils.teams}
         self.team_locks = {team: prwlock.RWLock() for team in utils.teams}
         self.game_locks = {game: prwlock.RWLock() for game in utils.games}
         if not os.path.exists (data_dir):
           os.makedirs (data_dir)
+        self.number_of_requests = 0
         
     def join_all_threads(self):
         for thread in self.__requests_thread:
