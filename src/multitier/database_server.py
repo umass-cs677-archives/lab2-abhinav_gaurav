@@ -92,32 +92,3 @@ class Database:
             write_data(team+'_medal.json', {game: self.medals[game] for game in utils.games})
         
         return json.dumps({"response":"success"})
-
-
-if __name__ == "__main__":
-    import signal
-    import argparse
-    import sys
-    
-    parser = argparse.ArgumentParser(description='Database Server')
-    parser.add_argument('-p', '--port', type=int, default=DATABASE_PORT, help='Database Port number')
-    args = parser.parse_args()
-
-    httpd = multi_thread_server.create_server(DatabaseHTTPServer, 
-                                              multi_thread_server.ServerRequestHandler, args.port)
-
-    def signal_handler(signal, frame):
-        '''Signal handler for SIGINT. Joins all request threads and 
-           close server socket before exiting.
-        '''
-        print "Shutting down server"
-        httpd.join_all_threads()
-        httpd.socket.close()
-        sys.exit(0)
-        
-    signal.signal(signal.SIGINT, signal_handler)
-    
-    print "Running HTTP Server"
-    print "Press CTRL+C to exit"
-    httpd.serve_forever()
-

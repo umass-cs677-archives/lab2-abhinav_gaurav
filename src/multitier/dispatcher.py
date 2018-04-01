@@ -76,7 +76,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         self.mutex.acquire()
         try:
             self.servers[serveraddress] -= 1
-            r = requests.get("http://" + minload_server + "/unregisterClient")
+            r = requests.get("http://" + serveraddress + "/unregisterClient")
             utils.check_response_for_failure(r.text)
         finally:
             self.mutex.release()

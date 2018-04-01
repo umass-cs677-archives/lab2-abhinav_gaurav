@@ -1,10 +1,10 @@
 import requests
 import time
-
+import signal
 import config
 import utils
 import random
-
+import sys
 
 class Cacofonix():
     """
@@ -14,9 +14,30 @@ class Cacofonix():
     def __init__(self, server_ip_address, server_port):
         self.server_ip_address = server_ip_address
         self.server_port = server_port
-        self.server_address = utils.create_address(server_ip_address, server_port)
+        self.dispatcher_address = utils.create_address(server_ip_address, server_port)
+        self.server_address = ""
+    
+    def getServer(self):
+        if (self.server_address != ""):
+            return
 
+        print "Getting server"
+        r = requests.get(self.dispatcher_address + '/getServer')
+        obj = utils.check_response_for_failure (r.text)
+        self.server_address = obj.server
+        print "Server Address obtained", self.server_address
+        
+    def releaseServer(self):
+        if (self.server_address == ""):
+            print "Server not registered"
+            return
+        
+        r = requests.get(self.dispatcher_address + '/releaseServer/'+self.server_address)
+        utils.check_response_for_failure (r.text)
+        self.server_address = ""
+        
     def setScore(self, eventType, romeScore, gaulScore, authID=config.AUTH_ID, to_print=True):
+        self.getServer ()
         if not romeScore.isdigit():
             raise Exception("Rome Score '%s' is not a positive integer" % (romeScore))
 
@@ -26,20 +47,21 @@ class Cacofonix():
         if eventType not in utils.games:
             raise Exception("Invalid team name '%s'" % eventType)
 
-        r = requests.get(self.server_address + '/setScore/%s/%s/%s/%s' % (eventType, romeScore, gaulScore, authID))
+        r = requests.get("http://"+self.server_address + '/setScore/%s/%s/%s/%s' % (eventType, romeScore, gaulScore, authID))
         obj = utils.check_response_for_failure(r.text)
         if to_print:
             print "Operation Successful"
         return obj
 
     def incrementMedalTally(self, team, medalType, authID=config.AUTH_ID, to_print=True):
+        self.getServer ()
         if team not in utils.teams:
             raise Exception("Invalid Team Name '%s'" % team)
 
         if medalType not in utils.medals:
             raise Exception("Invalid medal type '%s'" % medalType)
 
-        r = requests.get(self.server_address + '/incrementMedalTally/%s/%s/%s' % (team, medalType, authID))
+        r = requests.get("http://"+self.server_address + '/incrementMedalTally/%s/%s/%s' % (team, medalType, authID))
         obj = utils.check_response_for_failure(r.text)
         if (to_print):
             print "Operation Successful"
@@ -52,6 +74,7 @@ class Cacofonix():
         :param request_delay: delay in each request
         :return:
         """
+        self.getServer ()
         i = 0
         setScore_time = 0
         while i < n_requests:
@@ -109,7 +132,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Client Pull')
     parser.add_argument('--server_ip_addr', type=str, help='Server IP Address', required=True)
-    parser.add_argument('--server_port', type=int, default=config.CACOFONIX_PORT, help='Server port number')
+    parser.add_argument('--server_port', type=int, default=config.DISPATCHER_PORT, help='Server port number')
     parser.add_argument('--num_requests', type=int, help='Number of requests')
     parser.add_argument('--request_delay', type=float, help='Time delay in requests')
 
@@ -117,6 +140,17 @@ if __name__ == '__main__':
 
     cacofonix = Cacofonix(args.server_ip_addr, args.server_port)
 
+    def signal_handler(signal, frame):
+        '''Signal handler for SIGINT. Joins all request threads and 
+           close server socket before exiting.
+        '''
+        print "Shutting down client"
+        cacofonix.releaseServer ()
+        print "Client shutdown"
+        sys.exit(0)
+        
+    signal.signal(signal.SIGINT, signal_handler)
+    
     if args.num_requests is not None and args.request_delay is not None:
         try:
             n_requests = args.num_requests
