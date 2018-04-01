@@ -20,6 +20,7 @@ def json_to_object(json_str):
 
 def check_response_for_failure(r):
     obj = json_to_object(r)
+    print obj
     if obj.response == "failure":
         raise Exception("Request Failed. Reason '%s'" % obj.message)
 

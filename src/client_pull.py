@@ -61,9 +61,9 @@ class Client():
         obj = utils.check_response_for_failure(response)
 
         if to_print:
-            print "Medals:"
+            print "Medals and Timestamps:"
             for medal in utils.medals:
-                print medal, "= ", getattr(obj.medals, medal)
+                print medal, "= ", getattr(obj.medals, medal), "last updated at", time.ctime(float(getattr(obj.time, medal)))
 
         return obj
 
@@ -77,7 +77,7 @@ class Client():
             print "Score:"
             for team in utils.teams:
                 if hasattr(obj.scores, team):
-                    print team, ":", getattr(obj.scores, team)
+                    print team, ":", getattr(obj.scores, team), "last updated at", time.ctime(float((getattr(obj.time, team))))
 
         return obj
 
