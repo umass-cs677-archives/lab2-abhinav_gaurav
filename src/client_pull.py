@@ -170,22 +170,21 @@ if __name__ == '__main__':
     parser.add_argument('--dispatcher_ip_addr', type=str, help='Dispatcher IP Address', required=True)
     parser.add_argument('--dispatcher_port', type=int, default=config.DISPATCHER_PORT, help='Dispatcher port number')
     parser.add_argument('--num_requests', type=int, help='Number of requests')
-    parser.add_argument('--request_delay', type=float, help='Time delay in requests')
     args = parser.parse_args()
 
     dispatcher_ip_addr = args.dispatcher_ip_addr
     dispatcher_port = args.dispatcher_port
     client = Client(dispatcher_ip_addr, dispatcher_port)
 
-    if args.num_requests is not None and args.request_delay is not None:
+    if args.num_requests is not None:
         try:
             n_requests = args.num_requests
-            request_delay = args.request_delay
-            client.evaluate(n_requests, request_delay)
+            client.evaluate(n_requests, 0.001)
             sys.exit(0)
         except Exception as e:
             print "Provide number of requests and delay parameter in integer with -evaluate"
             print e
+            sys.exit(1)
 
     client.start_periodic_do ()
     

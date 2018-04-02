@@ -14,9 +14,9 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
        concurrently.
     '''
 
-    def __init__(self, server_addr, handler_cls, front_end_server_cls, fes_port, db_ip, db_port, ip):
+    def __init__(self, server_addr, handler_cls, front_end_server_cls, fes_port, db_ip, db_port, ip, n_servers):
         multi_thread_server.MultiThreadedHTTPServer.__init__(self, server_addr, handler_cls)
-        self.n_servers = 1 #TODO: command line args
+        self.n_servers = n_servers #TODO: command line args
         self.server_ip = "127.0.0.1"            # TODO
         self.server_port = fes_port
         self.mutex = threading.RLock()
@@ -29,7 +29,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
 
     def create_front_end_servers(self, number, server_ip, port):
         for i in range(0, number):
-            print "Starting server %d at " % number, server_ip, port
+            print "Starting server %d at " % i, server_ip, port
             server, th = multi_thread_server.create_and_run_server(self.front_end_server_cls,
                                                                    multi_thread_server.ServerRequestHandler, port,
                                                                    self.db_ip, str(self.db_port), self.full_addr)
@@ -85,7 +85,9 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
 
     def getAllServers(self):
         return json.dumps({"response": "success", "servers": list(self.servers.keys()) + [self.db_ip+":"+str(self.db_port)]})
-
+    
+    def getAllFrontEndServers(self):
+        return json.dumps({"response": "success", "servers": list(self.servers.keys())})
 
 if __name__ == "__main__":
     multi_thread_server.main(DispatcherHTTPServer)

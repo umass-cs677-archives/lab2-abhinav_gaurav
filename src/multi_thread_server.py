@@ -65,8 +65,7 @@ class MultiThreadedHTTPServer(HTTPServer):
         t.start()
         self.__requests_thread.append(t)
         
-    def call_request_handler(self, path, request):
-        
+    def call_request_handler(self, path, request):        
         #try:
             meth, args = self.parse_request_path(path)
             return meth(*args)
@@ -109,7 +108,6 @@ def create_and_run_server(server_class, handler_class, port, *args):
         Returns the (server object, thread)
     '''
     httpd = create_server(server_class, handler_class, port, *args)
-    print server_class
     th = utils.run_thread (HTTPServer.serve_forever, httpd)
     return (httpd, th)
 
