@@ -4,6 +4,7 @@ import time
 import random
 import utils
 import signal
+import config
 
 class Client():
     """
@@ -115,7 +116,7 @@ class Client():
     def start_periodic_do(self):
         self.periodic_running = True
         self.sleeping_time = 5
-        self.periodic_thread = utils.run_thread (Client._periodic_do_fun, self)
+        self.periodic_thread = utils.run_thread(Client._periodic_do_fun, self)
         
     def _periodic_do_fun(self):
         while self.periodic_running:
@@ -167,7 +168,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Client Pull')
     parser.add_argument('--dispatcher_ip_addr', type=str, help='Dispatcher IP Address', required=True)
-    parser.add_argument('--dispatcher_port', type=int, help='Dispatcher port number', required=True)
+    parser.add_argument('--dispatcher_port', type=int, default=config.DISPATCHER_PORT, help='Dispatcher port number')
     parser.add_argument('--num_requests', type=int, help='Number of requests')
     parser.add_argument('--request_delay', type=float, help='Time delay in requests')
     args = parser.parse_args()
