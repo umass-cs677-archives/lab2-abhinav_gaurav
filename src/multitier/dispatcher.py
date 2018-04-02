@@ -85,7 +85,9 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
 
     def getAllServers(self):
         return json.dumps({"response": "success", "servers": list(self.servers.keys()) + [self.db_ip+":"+str(self.db_port)]})
-
+    
+    def getAllFrontEndServers(self):
+        return json.dumps({"response": "success", "servers": list(self.servers.keys())})
 
 if __name__ == "__main__":
     multi_thread_server.main(DispatcherHTTPServer)

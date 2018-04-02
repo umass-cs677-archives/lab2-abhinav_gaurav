@@ -4,6 +4,8 @@ from multitier.dispatcher import DispatcherHTTPServer
 from multitier.database_server import Database
 from clocksync.leader_election import LeaderElection
 from clocksync.clock_sync import Clock
+from raffle.total_ordering import TotalOrdering
+
 import argparse
 import requests
 import utils
@@ -11,18 +13,40 @@ import config
 
 ################TODO: All functions that defined in child class but not defined in parent has to be defined in parent with exception "Not Implemented"
 #TODO: Add clock offset for each server in different directory
+server_count = 0
 
-class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection, Clock):
+class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection, Clock, TotalOrdering):
     def __init__(self, server_addr_port, handler_class, database_ip, database_port, disp_addr):
         self.addr_port = server_addr_port
         FrontEndHTTPServer.__init__(self, database_ip, database_port, disp_addr)
         MultiThreadedHTTPServer.__init__(self, server_addr_port, handler_class)
-        LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
-        Clock.__init__(self, 100)
+        #LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
+        #Clock.__init__(self, 100)
+        global server_count
+        TotalOrdering.__init__(self, server_count)
+        server_count += 1
         
     def get_all_servers(self):
         print "get all servers "+self.disp_addr
         r = requests.get('http://' + self.disp_addr + '/getAllServers/')    # TODO change to dispatcher port and addr
+        obj = utils.check_response_for_failure(r.text)
+        return obj.servers
+    
+    def process_request(self, request, client_address):
+        #self.multicast_ordering()
+        return MultiThreadedHTTPServer.process_request(self, request, client_address)
+        
+    def call_request_handler(self, path, request):        
+        #try:
+            if ("getMedalTally" in path or "getScore" in path):
+                self.multicast_ordering()
+            meth, args = self.parse_request_path(path)
+            return meth(*args)
+        #except Exception as e:
+        #    return json.dumps({"response": "failure", "me
+    def get_all_front_end_servers(self):
+        r = requests.get('http://' + self.disp_addr + '/getAllFrontEndServers/')    # TODO change to dispatcher port and addr
+        print r.text
         obj = utils.check_response_for_failure(r.text)
         return obj.servers
         
