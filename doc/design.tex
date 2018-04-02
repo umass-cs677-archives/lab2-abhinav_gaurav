@@ -1,0 +1,28 @@
+
+\documentclass{article}
+
+
+\usepackage[letterpaper, landscape, margin=1in]{geometry}
+
+
+\usepackage{fancyvrb} % verbatim replacement that allows latex
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+
+\begin{document}
+
+\section{TODO}
+. Please speccify whether your are using Python 2 or Python 3 in your design doc.
+program design 
+how it works
+possible improvements and extensions
+description of tests
+
+\section{Design Choices}
+We are using Python 2.
+
+\subsection{Database Schema}
+Since clients need to know the time when the score was last updated we decided to keep a json file as our database table. In order to get maximum throughput we save all the game scores in separate files and also the medal tally are in separate file for both the teams. Hence, unless there is a query for same game or same team tally the database server would process them parallely in separate thereads and they require separate locks.
+
+
+
+\end{document}
