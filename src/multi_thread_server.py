@@ -108,7 +108,6 @@ def create_and_run_server(server_class, handler_class, port, *args):
         Returns the (server object, thread)
     '''
     httpd = create_server(server_class, handler_class, port, *args)
-    print server_class
     th = utils.run_thread (HTTPServer.serve_forever, httpd)
     return (httpd, th)
 

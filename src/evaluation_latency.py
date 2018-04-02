@@ -29,12 +29,13 @@ if (client_type == "pull"):
     clients_process = []
     for i in range(0, n_clients):
         clients_process.append(
-            run_command("python client_pull.py --server_ip_addr 127.0.0.1 --server_port 5000 --num_requests %d --request_delay %f" % (n_requests, client_delay)))
+            run_command("python client_pull.py --dispatcher_ip_addr 127.0.0.1 --dispatcher_port 5000 --num_requests %d" % (n_requests)))
 
     print "Clients Data:"
     times = {"getScore": 0, "getMedalTally": 0}
     for p in clients_process:
         p.join()
+        print p.retval
         times["getScore"] += float(re.findall(r'each getScore.+?(\d*\.\d+|\d)+', p.retval)[0])
         times["getMedalTally"] += float(re.findall(r'each getMedalTally.+?(\d*\.\d+|\d)+', p.retval)[0])
 

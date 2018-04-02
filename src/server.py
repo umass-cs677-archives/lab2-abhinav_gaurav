@@ -57,7 +57,7 @@ def main():
     parser.add_argument('--fes_port', type=int, default=config.FRONT_END_PORT, help='Front-end servers starting port number')
     parser.add_argument('--db_ip', type=str, default="127.0.0.1", help='Database IP Addr')
     parser.add_argument('--db_port', type=int, default=config.DATABASE_PORT, help='Database Port number')
-
+    parser.add_argument('--n_servers', type=int, default=2, help='Number of Front End Servers')
     cmdargs = parser.parse_args()
     
     #Run Dispatcher and Front End servers
@@ -65,7 +65,7 @@ def main():
                           cmdargs.disp_port,
                           MultiThreadedFrontEndServer, cmdargs.fes_port,
                           cmdargs.db_ip, cmdargs.db_port, 
-                          cmdargs.disp_ip)
+                          cmdargs.disp_ip, cmdargs.n_servers)
     set_sigint_handler(httpd)
 
     print "Running Front End HTTP Server"
