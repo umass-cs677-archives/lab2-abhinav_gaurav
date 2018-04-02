@@ -9,7 +9,8 @@ import prwlock
 import time
 import signal
 import argparse
-    
+
+
 class ServerRequestHandler(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
@@ -25,20 +26,21 @@ class ServerRequestHandler(BaseHTTPRequestHandler):
         self._set_headers()
         self.wfile.write(self.server.call_request_handler(urllib.unquote(self.path), self.request))
 
+
 class MultiThreadedHTTPServer(HTTPServer):
     def __init__(self, *args, **kwargs):
         HTTPServer.__init__(self, *args, **kwargs)
         self.__requests_thread = []
         self.authID = config.AUTH_ID
-    
+
     def check_authentication(self, authID):
         if (authID != self.authID):
             raise Exception("Authentication Failed '%s'" % authID)
 
     def join_all_threads(self):
         for thread in self.__requests_thread:
-            thread.join ()
-        
+            thread.join()
+
     def process_request_thread(self, request, client_address):
         """
         The method that every thread executes.
@@ -64,12 +66,12 @@ class MultiThreadedHTTPServer(HTTPServer):
                              args=(request, client_address))
         t.start()
         self.__requests_thread.append(t)
-        
-    def call_request_handler(self, path, request):        
-        #try:
-            meth, args = self.parse_request_path(path)
-            return meth(*args)
-        #except Exception as e:
+
+    def call_request_handler(self, path, request):
+        # try:
+        meth, args = self.parse_request_path(path)
+        return meth(*args)
+        # except Exception as e:
         #    return json.dumps({"response": "failure", "message": str(e)})
 
     def parse_request_path(self, path):
@@ -108,19 +110,19 @@ def create_and_run_server(server_class, handler_class, port, *args):
         Returns the (server object, thread)
     '''
     httpd = create_server(server_class, handler_class, port, *args)
-    th = utils.run_thread (HTTPServer.serve_forever, httpd)
+    th = utils.run_thread(HTTPServer.serve_forever, httpd)
     return (httpd, th)
 
 
-def parse_command_line_args (desc):
+def parse_command_line_args(desc):
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-p', '--port', type=int, help='Port number', required=True)
     return parser.parse_args()
 
 
-def set_sigint_handler (httpd):
+def set_sigint_handler(httpd):
     import sys
-    
+
     def signal_handler(signal, frame):
         '''Signal handler for SIGINT. Joins all request threads and
            close server socket before exiting.
@@ -133,16 +135,15 @@ def set_sigint_handler (httpd):
     signal.signal(signal.SIGINT, signal_handler)
 
 
-def main (serverclass):
-    
+def main(serverclass):
     cmdargs = parse_command_line_args("Server")
     httpd = create_server(serverclass, ServerRequestHandler, cmdargs.port)
-    set_sigint_handler (httpd)
-    
+    set_sigint_handler(httpd)
+
     print "Running HTTP Server"
     print "Press CTRL+C to exit"
     httpd.serve_forever()
 
 
 if __name__ == "__main__":
-    main (serverclass=MultiThreadedHTTPServer)
+    main(serverclass=MultiThreadedHTTPServer)

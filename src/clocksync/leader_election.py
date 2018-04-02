@@ -1,5 +1,6 @@
 import sys
-sys.path.insert (0, "../")
+
+sys.path.insert(0, "../")
 
 import requests
 import time
@@ -7,14 +8,15 @@ import config
 import utils
 import json
 
+
 class LeaderElection:
     def __init__(self, server_id):
         '''
         :param id: Server Address
         '''
         self.id = server_id
-                                    # TODO: check initialization and Lock needed. Never Decreases!!!
-        self.servers = []      # TODO: need to be initialized
+        # TODO: check initialization and Lock needed. Never Decreases!!!
+        self.servers = []  # TODO: need to be initialized
         utils.run_thread(self.perpetual_election)
 
     def get_info(self):
@@ -27,7 +29,7 @@ class LeaderElection:
         Runs on a thread perpetually. Purpose: Start Election.
         :return:
         '''
-        while True:                                     # TODO
+        while True:  # TODO
             time.sleep(config.ELECTION_SNOOZE)
             if not self.servers:
                 self.get_info()
@@ -36,11 +38,11 @@ class LeaderElection:
     def coordinatorMessage(self, leader_addr):
         if (leader_addr == self.id):
             print "I am the leader", leader_addr
-            self.set_leader ()
+            self.set_leader()
         else:
-            self.unset_leader ()
-        # r = requests.get(self.servers[(self.idx + 1) % len(self.servers)] + '/incrementMedalTally/%s' % (leader_addr))
-        # obj = utils.check_response_for_failure(r.text)
+            self.unset_leader()
+            # r = requests.get(self.servers[(self.idx + 1) % len(self.servers)] + '/incrementMedalTally/%s' % (leader_addr))
+            # obj = utils.check_response_for_failure(r.text)
 
     def newElection(self):
         r = requests.get('http://' + self.next_server + '/passElection/%s/%d' % (self.id, self.get_load()))
@@ -55,16 +57,16 @@ class LeaderElection:
         if not self.servers:
             self.get_info()
         sz = len(args)
-        ids = [args[x] for x in range(sz/2)]
-        loads = [int(args[x]) for x in range(sz/2, sz)]
+        ids = [args[x] for x in range(sz / 2)]
+        loads = [int(args[x]) for x in range(sz / 2, sz)]
 
-        if self.id in ids:              # Time to find and elect leader
+        if self.id in ids:  # Time to find and elect leader
             minm = min(loads)
             indices = [i for i, x in enumerate(loads) if x == minm]
             subset_ids = [ids[i] for i in indices]
             leader_addr = min(subset_ids)
             self.coordinatorMessage(leader_addr)
-        else:                           # Pass on the message
+        else:  # Pass on the message
             ids.append(self.id)
             loads.append(str(self.get_load()))
 
@@ -73,9 +75,9 @@ class LeaderElection:
             obj = utils.check_response_for_failure(r.text)
 
         return json.dumps({"response": "success"})
-    
-    def get_all_servers (self):
+
+    def get_all_servers(self):
         raise NotImplemented("LeaderElection.get_all_servers not implemented")
-        
-    def get_load (self):
+
+    def get_load(self):
         raise NotImplemented("LeaderElection.get_load not implemented")
