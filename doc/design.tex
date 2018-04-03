@@ -42,7 +42,7 @@ All the servers (front-end, database) have a thread running on them which implem
 Clock Synchronization happens every Delta/(2*rho) seconds, specified in config file. It implements Berkley's Algorithm. The Master clock is the leader among the servers (front-end, database). As the leader is elected based on load, master is the most resourceful server.
 
 \subsection{Total Ordering}
-We implement the totally ordered multicasting. The test file confirms the order of elements that are popped from the queue. Confirming that the order is same across servers.
+We implement the totally ordered multicasting. The test file confirms the order of elements that are popped from the queue are same for all the servers. Confirming that the order is same across servers.
 
 
 \subsection{Front End Server}
@@ -55,4 +55,5 @@ Uses Multiple Inheritance to achieve this.
 
 \subsection{Client}
 We have designed the Client to do both forceful client-pull whenever required and periodic client-pull perpetually in the background.
+
 \end{document}
