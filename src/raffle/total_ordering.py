@@ -66,10 +66,8 @@ class TotalOrdering:
             with self.__rwlock.writer_lock ():
                 self.logical_id += 1
             s = 'http://' + server + '/multicastMsg/%d/%d/%d' % (self.logical_id, self.pid, msg_id)
-            with self.print_mutex:
-                print s
-            r = requests.get(s)
-            utils.check_response_for_failure(r.text)
+            r = utils.run_thread (requests.get, s)
+            #utils.check_response_for_failure(r.text)
 
     def in_queue(self, msg_id, pid):
         for i in range(len(self.queue)):
@@ -119,9 +117,7 @@ class TotalOrdering:
                     q = 'http://' + server + '/multicastAck/%d/%d/%d/%s' % (self.logical_id, int(pid), int(msg_id),
                                                                                       "127.0.0.1:%d" % (
                                                                                           6000 + self.pid))
-                    while self.print_mutex:
-                        print "ack to server", server, "by ", self.pid2server(self.pid)
-                    r = requests.get(q)  # TODO: Change this pid to server conversion
+                    r = utils.run_thread (requests.get, q)  # TODO: Change this pid to server conversion
 
         return json.dumps({"response": "success"})
 
@@ -154,12 +150,16 @@ class TotalOrdering:
             
             with self.print_mutex:
                 print "queue for pid ", self.pid, self.queue
+                
             if len(self.queue[0][2]) == self.greater_pids[self.pid]:
                 e = self.queue.pop(0)
                 self.popped_elems.append (e)
                 msg_id, pid, _ = e
                 is_set_full = True
-        
+                
+        with self.print_mutex:
+            print "POPPED ELEMENTS FOR ", self.pid, "WWW", self.popped_elems
+            
         if is_set_full:
                 for pid in self.pids:
                     if pid < self.pid:
@@ -168,9 +168,8 @@ class TotalOrdering:
                         w = 'http://' + self.pid2server(pid) + '/multicastAck/%d/%d/%d/%s' % (
                             int(self.logical_id), int(pid), int(msg_id), "127.0.0.1:%d" % (
                                 6000 + self.pid))
-                        with self.print_mutex:
-                            print "multicastAck to ", self.pid2server(pid), " by server ", self.pid2server(self.pid)
-                        r = requests.get(w)  # TODO create dictionary pid2server
+                        
+                        r = utils.run_thread (requests.get, w)  # TODO create dictionary pid2server
 
         return json.dumps({"response": "success"})
 
