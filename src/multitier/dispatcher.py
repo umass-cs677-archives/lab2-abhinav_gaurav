@@ -27,6 +27,9 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         self.servers = {}  # Dictionary of Server addresses and number of clients associated with them
         self.create_front_end_servers(self.n_servers, self.server_ip, self.server_port)
 
+        self.lock = threading.Lock()
+        self.can_lock = True
+
     def create_front_end_servers(self, number, server_ip, port):
         for i in range(0, number):
             print "Starting server %d at " % i, server_ip, port
@@ -63,6 +66,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         utils.check_response_for_failure(r.text)
         return json.dumps({"response": "success", "server": minload_server})
 
+
     def releaseServer(self, serveraddress):
         ''' REST Endpoint for a client to release the server. 
             Decrements the load count on server
@@ -89,6 +93,34 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
 
     def getAllFrontEndServers(self):
         return json.dumps({"response": "success", "servers": list(self.servers.keys())})
+
+    def getLeaderElectionLock(self):
+        '''
+        Centralized lock API for leader election lock.
+        :return:
+        '''
+        if not self.central_lock.acquire(wait=False):
+            return False
+        else:
+            try:
+                assert self.lock.locked() == True, "What!!?"
+                if self.can_lock:
+                    self.can_lock = False
+                    return json.dumps({"response": "success", "can_lock": True})
+                else:
+                    return json.dumps({"response": "success", "can_lock": False})
+            finally:
+                self.lock.release()
+
+    def releaseLeaderElectionLock(self):
+        '''
+        API to release leader election lock.
+        :return:
+        '''
+        with self.lock:
+            assert self.lock.locked() == True, "What!!?"
+            self.can_lock = True
+        return json.dumps({"response": "success"})
 
 
 if __name__ == "__main__":

@@ -33,12 +33,18 @@ class LeaderElection:
             time.sleep(config.ELECTION_SNOOZE)
             if not self.servers:
                 self.get_info()
-            self.newElection()
+            r = requests.get('http://' + self.disp_addr + '/getLeaderElectionLock')
+            obj = utils.check_response_for_failure(r.text)
+            if obj.can_lock:
+                self.newElection()
+
 
     def coordinatorMessage(self, leader_addr):
         if (leader_addr == self.id):
             print "I am the leader", leader_addr
             self.set_leader()
+            r = requests.get('http://' + self.disp_addr + '/releaseLeaderElectionLock')
+            utils.check_response_for_failure(r.text)
         else:
             self.unset_leader()
             # r = requests.get(self.servers[(self.idx + 1) % len(self.servers)] + '/incrementMedalTally/%s' % (leader_addr))
