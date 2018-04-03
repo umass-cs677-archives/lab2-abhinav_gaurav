@@ -124,8 +124,9 @@ class Client():
         print "Time taken to perform %d getMedalTally_time requests:" % n_requests, getMedalTally_time
         print "Time taken to perform each getMedalTally request:", float(getMedalTally_time) / n_requests
 
-    def start_periodic_do(self):
+    def start_periodic_do(self, to_print=True):
         self.periodic_running = True
+        self.to_print=to_print
         self.sleeping_time = config.SLEEP_TIME
         self.periodic_thread = utils.run_thread(Client._periodic_do_fun, self)
 
@@ -134,14 +135,14 @@ class Client():
             for team in utils.teams:
                 print "Getting Medal Tally for", team
                 try:
-                    self.getMedalTally(team)
+                    self.getMedalTally(team, self.to_print)
                 except Exception as e:
                     print e
 
             for event in utils.games:
                 print "Getting Score for", event
                 try:
-                    self.getScore(event)
+                    self.getScore(event, self.to_print)
                 except Exception as e:
                     print e
 
