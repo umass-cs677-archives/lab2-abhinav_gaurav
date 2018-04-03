@@ -23,7 +23,7 @@ class TotalOrdering:
         self.queue = []
         self.__rwlock = prwlock.RWLock ()
         self.print_mutex = threading.RLock ()
-        self.popped_elems = []
+        self.processed_reqs = []
         
     def compute_info(self):
         if self.servers != []:
@@ -47,7 +47,7 @@ class TotalOrdering:
         '''
         with self.__rwlock.reader_lock ():
             with self.print_mutex:
-                pass#print "Popped Elements for pid ", self.pid, self.popped_elems
+                pass#print "Popped Elements for pid ", self.pid, self.processed_reqs
                 
         #print "multicase_ordering of server ", self.pid2server(self.pid), threading.currentThread ()
         with self.__rwlock.writer_lock ():
@@ -95,7 +95,7 @@ class TotalOrdering:
             self.compute_info()
             # Step 3: Insert in local queue the message that is received
             idx = self.in_queue(msg_id, pid)
-            if idx == -1 and self.in_list(self.popped_elems, msg_id, pid) == -1:
+            if idx == -1 and self.in_list(self.processed_reqs, msg_id, pid) == -1:
                 self.queue.append((int(msg_id), int(pid), set()))
             sorted(self.queue, key=(lambda x: (x[0], x[1])))
         
@@ -104,7 +104,7 @@ class TotalOrdering:
         
         # Step 4: Message delivered check if head is acknowledged by all
             if self.greater_pids[self.pid] == 0:  ## I am the biggest server
-                self.popped_elems.append (self.queue.pop(0))
+                self.processed_reqs.append (self.queue.pop(0))
         
         if self.greater_pids[self.pid] == 0:
             # Step 5: Send Acknowledgement
@@ -153,12 +153,12 @@ class TotalOrdering:
                 
             if len(self.queue[0][2]) == self.greater_pids[self.pid]:
                 e = self.queue.pop(0)
-                self.popped_elems.append (e)
+                self.processed_reqs.append (e)
                 msg_id, pid, _ = e
                 is_set_full = True
                 
         with self.print_mutex:
-            print "POPPED ELEMENTS FOR ", self.pid, "WWW", self.popped_elems
+            print "POPPED ELEMENTS FOR ", self.pid, "WWW", self.processed_reqs
             
         if is_set_full:
                 for pid in self.pids:
@@ -175,3 +175,6 @@ class TotalOrdering:
 
     def pid2server(self, pid):
         return '127.0.0.1:%d' % (6000 + pid)
+
+    def get_all_processed_reqs(self):
+        return [(x[0], x[1]) for x in self.processed_reqs]

@@ -98,7 +98,11 @@ class MultiThreadedHTTPServer(HTTPServer):
 
         return (request_method, args)
 
-
+    def shutdown_server(self):
+        #self.shutdown()
+        self.join_all_threads()
+        self.socket.close()
+        
 def create_server(server_class, handler_class, port, *args):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class, *args)
@@ -128,8 +132,8 @@ def set_sigint_handler(httpd):
            close server socket before exiting.
         '''
         print "Shutting down server"
-        httpd.join_all_threads()
-        httpd.socket.close()
+        httpd.shutdown_server()
+
         sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)

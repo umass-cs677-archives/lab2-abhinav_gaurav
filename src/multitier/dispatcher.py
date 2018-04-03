@@ -1,6 +1,7 @@
 import sys
+import os
 
-sys.path.insert(0, "../")
+sys.path.insert(0, os.path.dirname(os.path.dirname(sys.modules[__name__].__file__)))
 
 import utils
 import json
@@ -25,11 +26,12 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         self.db_port = db_port
         self.full_addr = ip + ":" + str(server_addr[1])
         self.servers = {}  # Dictionary of Server addresses and number of clients associated with them
+        self.server_threads = [] #List of tuples of server objects and threads
         self.create_front_end_servers(self.n_servers, self.server_ip, self.server_port)
 
         self.lock = threading.Lock()
         self.can_lock = True
-
+        
     def create_front_end_servers(self, number, server_ip, port):
         for i in range(0, number):
             print "Starting server %d at " % i, server_ip, port
@@ -39,7 +41,8 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             full_address = self.server_ip + ":" + str(port)
             port += 1
             self.servers[full_address] = 0
-
+            self.server_threads.append ((server, th))
+            
     def getServer(self):
         ''' REST endpoint for getting server.
             Returns the address to server and increments the load count
@@ -122,6 +125,16 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             self.can_lock = True
         return json.dumps({"response": "success"})
 
-
+    def shutdown_server(self):
+        for server, th in self.server_threads:
+            server.shutdown()
+            server.shutdown_server()
+            th.join()
+            
+        multi_thread_server.MultiThreadedHTTPServer.shutdown_server(self)
+    
+    def get_all_servers(self):
+        return [x[0] for x in self.server_threads]
+        
 if __name__ == "__main__":
     multi_thread_server.main(DispatcherHTTPServer)
