@@ -4,7 +4,7 @@ from multitier.dispatcher import DispatcherHTTPServer
 from multitier.database_server import Database
 from clocksync.leader_election import LeaderElection
 from clocksync.clock_sync import Clock
-from raffle.total_ordering import TotalOrdering
+from raffle.total_ordering import Raffle
 
 import argparse
 import requests
@@ -16,15 +16,22 @@ import config
 server_count = 0
 
 
-class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection, Clock, TotalOrdering):
-    def __init__(self, server_addr_port, handler_class, database_ip, database_port, disp_addr):
+class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection, Clock, Raffle):
+    def __init__(self, server_addr_port, handler_class, database_ip, database_port, disp_addr,
+                is_leader_election, is_clock_sync, is_raffle):
         self.addr_port = server_addr_port
         FrontEndHTTPServer.__init__(self, database_ip, database_port, disp_addr)
         MultiThreadedHTTPServer.__init__(self, server_addr_port, handler_class)
-        # LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
-        # Clock.__init__(self, 100)
+        if (is_leader_election):
+            print "Enabling Leader Election"
+            LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
+        if (is_clock_sync):
+            print "Enabling Clock Synchronization"
+            Clock.__init__(self, 100)
         global server_count
-        TotalOrdering.__init__(self, server_count)
+        if (is_raffle):
+            print "Enabling Total Ordering and Raffle"
+            Raffle.__init__(self, server_count, 100)
         server_count += 1
 
     def get_all_servers(self):
@@ -63,14 +70,29 @@ def main():
     parser.add_argument('--db_ip', type=str, default="127.0.0.1", help='Database IP Addr')
     parser.add_argument('--db_port', type=int, default=config.DATABASE_PORT, help='Database Port number')
     parser.add_argument('--n_servers', type=int, default=2, help='Number of Front End Servers')
+    parser.add_argument('--is_leader_election',type=str, default="True", help="Leader Election Enabled?")
+    parser.add_argument('--is_clock_sync',type=str, default="True", help="Clock Synchronization Enabled?")
+    parser.add_argument('--is_raffle',type=str, default="True", help="Raffle Enabled?")
+    
     cmdargs = parser.parse_args()
 
+    def str2bool (s):
+        if s.lower() == "true":
+            return True
+        if s.lower() == "false":
+            return False
+        raise Exception("Invalid Argument to str2bool, '%s'"%s)
+        
+    print "cmdargs, is_leader_election", cmdargs.is_leader_election
     # Run Dispatcher and Front End servers
     httpd = create_server(DispatcherHTTPServer, ServerRequestHandler,
                           cmdargs.disp_port,
                           MultiThreadedFrontEndServer, cmdargs.fes_port,
                           cmdargs.db_ip, cmdargs.db_port,
-                          cmdargs.disp_ip, cmdargs.n_servers)
+                          cmdargs.disp_ip, cmdargs.n_servers,
+                          str2bool(cmdargs.is_leader_election), 
+                          str2bool(cmdargs.is_clock_sync), str2bool(cmdargs.is_raffle), 
+                          str2bool(cmdargs.is_raffle))
     set_sigint_handler(httpd)
 
     print "Running Front End HTTP Server"

@@ -19,7 +19,7 @@ class TestTotalOrdering(unittest.TestCase):
                           config.DISPATCHER_PORT,
                           MultiThreadedFrontEndServer, config.FRONT_END_PORT,
                           "127.0.0.1", config.DATABASE_PORT,
-                          "127.0.0.1", self.n_servers)
+                          "127.0.0.1", self.n_servers, False, False, True, False)
         self.clients = []
         
         for i in range(self.n_servers):

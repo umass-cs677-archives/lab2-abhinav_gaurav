@@ -174,7 +174,28 @@ class TotalOrdering:
 
     def get_all_processed_reqs(self):
         with self.__rwlock.writer_lock():
-            self.processed_reqs = [(x[0], x[1]) for x in self.queue]
+            processed_reqs = [(x[0], x[1]) for x in self.queue]
             self.queue = []
+            return processed_reqs
+    
+    def clearReqQueue(self):
+        with self.__rwlock.writer_lock():
+            self.queue = []
+        return json.dumps({"response":"success"})
+        
+class Raffle (TotalOrdering):
+    def __init__ (self, _pid, raffleLength):
+        TotalOrdering.__init__(self, _pid)
+        self.__raffleLength = raffleLength
+        
+    def chooseRaffleWinner(self, rand_winner):
+        processed_reqs = self.get_all_processed_reqs()
+        all_hundreth_reqs = []
+        for i,x in enumerate(processed_reqs):
+            if i%self.__raffleLength == 0:
+                all_hundreth_reqs += [x]
+        if len(all_hundreth_reqs) == 0:
+            return json.dumps({"response": "success", "winner":"No Winner Yet"})
             
-        return self.processed_reqs
+        idx = int(rand_winner)%len(all_hundreth_reqs)
+        return json.dumps({"response":"success", "winner":str(all_hundreth_reqs[idx])})
