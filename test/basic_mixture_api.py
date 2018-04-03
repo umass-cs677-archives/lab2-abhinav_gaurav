@@ -1,6 +1,7 @@
 import unittest
+import random
 # import time
-#
+
 from ..src.server import MultiThreadedFrontEndServer, ServerRequestHandler, create_server
 from ..src.multi_thread_server import create_and_run_server
 from ..src.multitier.dispatcher import DispatcherHTTPServer
@@ -8,9 +9,7 @@ from ..src.client_pull import Client
 from ..src.cacofonix import Cacofonix
 from ..src import config as config
 from ..src import utils as utils
-
-#
-# from utils import run_thread
+from ..src.multitier.team import Team
 
 
 class BasicTests(unittest.TestCase):
@@ -26,13 +25,38 @@ class BasicTests(unittest.TestCase):
         for i in range(self.n_servers):
             self.clients.append(Client("127.0.0.1", "5000"))
 
+        self.teams = {team: Team(team, utils.games) for team in utils.teams}
         self.cacofonix = Cacofonix("127.0.0.1", "5000")
+        # self.database = create_and_run_server()     #TODO run database server
 
+    def test_database_locking(self):
+        self.front_end_servers = self.server.get_all_servers()
 
-    def database_locking(self):
-        pass
+        t = []
+        for i in range(1):
+            team = random.sample(utils.teams, 1)[0]
+            medal_type = random.sample(utils.medals, 1)[0]
 
-    def test_cacofonix_to_client(self):
+            # update cacofinix's state
+            self.teams[team].medals[medal_type] += 1
+
+            # API call to update server
+            q = utils.run_thread(self.cacofonix.incrementMedalTally, team, medal_type)
+            t.append(q)
+
+        # join threads
+        for _t in t:
+            print 'shit', _t
+            _t.join()
+
+        for team in utils.teams:
+            print "Test case data", self.teams[team].medals
+            response = self.front_end_servers[0].getMedalTally(team)
+            obj = utils.check_response_for_failure(response)
+            print "Received from server", obj.medals
+            self.assertTrue(obj.medals == self.teams[team].medals)
+
+    def cacofonix_to_client(self):
         self.cacofonix.setScore(utils.games[0], "5", "11")
         scores = self.clients[0].getScore(utils.games[0]).scores
         for team in utils.teams:
