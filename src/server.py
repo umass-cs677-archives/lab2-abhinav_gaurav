@@ -4,7 +4,7 @@ from multitier.dispatcher import DispatcherHTTPServer
 from multitier.database_server import Database
 from clocksync.leader_election import LeaderElection
 from clocksync.clock_sync import Clock
-from raffle.total_ordering import TotalOrdering
+from raffle.total_ordering import Raffle
 
 import argparse
 import requests
@@ -16,7 +16,7 @@ import config
 server_count = 0
 
 
-class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection, Clock, TotalOrdering):
+class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection, Clock, Raffle):
     def __init__(self, server_addr_port, handler_class, database_ip, database_port, disp_addr):
         self.addr_port = server_addr_port
         FrontEndHTTPServer.__init__(self, database_ip, database_port, disp_addr)
@@ -24,7 +24,7 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
         # LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
         # Clock.__init__(self, 100)
         global server_count
-        TotalOrdering.__init__(self, server_count)
+        Raffle.__init__(self, server_count, 100)
         server_count += 1
 
     def get_all_servers(self):

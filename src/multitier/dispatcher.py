@@ -8,7 +8,8 @@ import json
 import threading
 import requests
 import multi_thread_server
-
+import time
+import config
 
 class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
     '''Multi-Threaded Database HTTP Server to handle several client requests
@@ -42,7 +43,9 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             port += 1
             self.servers[full_address] = 0
             self.server_threads.append ((server, th))
-            
+        
+        self.start_raffle_thread()
+        
     def getServer(self):
         ''' REST endpoint for getting server.
             Returns the address to server and increments the load count
@@ -131,10 +134,28 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             server.shutdown_server()
             th.join()
             
+        self.end_raffle_thread()
         multi_thread_server.MultiThreadedHTTPServer.shutdown_server(self)
     
     def get_all_servers(self):
         return [x[0] for x in self.server_threads]
+    
+    def start_raffle_thread(self):
+        self.__raffle_running = True
+        self.raffle_thread = utils.run_thread(self.__raffle_thread_func)
+        
+    def __raffle_thread_func(self):
+        while self.__raffle_running:
+            time.sleep(config.RAFFLE_TIME)
+            r = requests.get('http://'+self.servers.keys()[0]+'/chooseRaffleWinner/10') #TODO: Make this random number
+            obj = utils.check_response_for_failure(r.text)
+            print "Winner of Raffle is", obj.winner
+            for server in self.servers.keys():
+                r = requests.get('http://'+server+"/clearReqQueue")
+                
+    def end_raffle_thread(self):
+        self.__raffle_running = False
+        self.raffle_thread.join()
         
 if __name__ == "__main__":
     multi_thread_server.main(DispatcherHTTPServer)
