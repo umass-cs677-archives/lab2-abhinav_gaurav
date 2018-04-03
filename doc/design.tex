@@ -1,4 +1,3 @@
-
 \documentclass{article}
 
 
@@ -17,12 +16,39 @@ how it works
 possible improvements and extensions
 description of tests
 
-\section{Design Choices}
+\section{Design}
 We are using Python 2.
 
-\subsection{Database Schema}
-Since clients need to know the time when the score was last updated we decided to keep a json file as our database table. In order to get maximum throughput we save all the game scores in separate files and also the medal tally are in separate file for both the teams. Hence, unless there is a query for same game or same team tally the database server would process them parallely in separate thereads and they require separate locks.
+\subsection{Multi Threaded Server}
 
+\subsection{Database}
 
+Use REST API for Database Server
+\paragraph{Database Schema}
+Since clients need to know the time when the score was last updated we 
+decided to keep a json file as our database table. In order to get 
+maximum throughput we save all the game scores in separate files and 
+also the medal tally are in separate file for both the teams. Hence, 
+unless there is a query for same game or same team tally the database
+server would process them parallely in separate thereads and they 
+require separate locks.
+
+\subsection{Front End Server}
+
+\subsection{Dispatcher}
+Find the server with minimum number of clients connected.
+
+\subsection{Leader Election}
+happens every some seconds, specified in config file
+\subsection{Clock Synchronization}
+happens every Delta/(2*rho) seconds, specify in config file
+\subsection{Total Ordering}
+
+\subsection{Combined Server}
+This server is the culmination of all 5 servers: Multi Threaded Server, 
+Front End Server, Leader Election, Clock Synchronization, Total Ordering.
+Uses Multiple Inheritance to achieve this.
+
+\subsection{Client}
 
 \end{document}
