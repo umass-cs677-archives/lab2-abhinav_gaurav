@@ -19,7 +19,8 @@ class BasicTests(unittest.TestCase):
                                                                 config.DISPATCHER_PORT,
                                                                 MultiThreadedFrontEndServer, config.FRONT_END_PORT,
                                                                 "127.0.0.1", config.DATABASE_PORT,
-                                                                "127.0.0.1", self.n_servers)
+                                                                "127.0.0.1", self.n_servers,
+                                                                False, True, False, False)
         self.clients = []
 
         for i in range(self.n_servers):
@@ -33,7 +34,7 @@ class BasicTests(unittest.TestCase):
         self.front_end_servers = self.server.get_all_servers()
 
         t = []
-        for i in range(1):
+        for i in range(100):
             team = random.sample(utils.teams, 1)[0]
             medal_type = random.sample(utils.medals, 1)[0]
 
@@ -46,7 +47,6 @@ class BasicTests(unittest.TestCase):
 
         # join threads
         for _t in t:
-            print 'shit', _t
             _t.join()
 
         for team in utils.teams:
@@ -54,7 +54,9 @@ class BasicTests(unittest.TestCase):
             response = self.front_end_servers[0].getMedalTally(team)
             obj = utils.check_response_for_failure(response)
             print "Received from server", obj.medals
-            self.assertTrue(obj.medals == self.teams[team].medals)
+            for key in self.teams[team].medals.keys():
+                #rint getattr(obj.medals, key), self.teams[team].medals[key], key
+                self.assertTrue(getattr(obj.medals, key) == self.teams[team].medals[key])
 
     def cacofonix_to_client(self):
         self.cacofonix.setScore(utils.games[0], "5", "11")
