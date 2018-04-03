@@ -1,15 +1,18 @@
 import sys
+import os
 
-sys.path.insert(0, "../")
+sys.path.insert(0, os.path.dirname(os.path.dirname(sys.modules[__name__].__file__)))
 
-import utils
-import json
-import requests
 import config
 import prwlock
 import time
 import multi_thread_server
+import utils
+import json
+import requests
 import time
+
+
 
 
 class FrontEndHTTPServer():
