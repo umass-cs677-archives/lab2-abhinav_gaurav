@@ -94,14 +94,14 @@ class TotalOrdering:
             idx = self.in_queue(msg_id, pid)
             if idx == -1 and self.in_list(self.processed_reqs, msg_id, pid) == -1:
                 self.queue.append((int(msg_id), int(pid), set()))
-            sorted(self.queue, key=(lambda x: (x[0], x[1])))
+            self.queue = sorted(self.queue, key=(lambda x: (x[0], x[1])))
         
-            with self.print_mutex:
-                print "Pid", self.pid, "Queue", self.queue, "greater_pids", self.greater_pids
+            #with self.print_mutex:
+            #    print "Pid", self.pid, "Queue", self.queue, "greater_pids", self.greater_pids
         
         # Step 4: Message delivered check if head is acknowledged by all
-            if self.greater_pids[self.pid] == 0:  ## I am the biggest server
-                self.processed_reqs.append (self.queue.pop(0))
+            #if self.greater_pids[self.pid] == 0:  ## I am the biggest server
+            #    self.processed_reqs.append (self.queue.pop(0))
         
         if self.greater_pids[self.pid] == 0:
             # Step 5: Send Acknowledgement
@@ -138,19 +138,19 @@ class TotalOrdering:
             if idx == -1:
                 # Step 3: Insert in local queue the message that is received
                 self.queue.append((int(msg_id), int(pid), set([server_pid])))
-                sorted(self.queue, key=(lambda x: (x[0], x[1])))
             else:
                 self.logical_id = max(int(logical_id), self.logical_id) + 1
                 self.queue[idx][2].add(server_pid)  # received acknowledgment from server
-                sorted(self.queue, key=(lambda x: (x[0], x[1])))
+            
+            self.queue = sorted(self.queue, key=(lambda x: (x[0], x[1])))
                 
             with self.print_mutex:
                 print "queue for pid ", self.pid, self.queue
                 
-            if len(self.queue[0][2]) == self.greater_pids[self.pid]:
-                e = self.queue.pop(0)
-                self.processed_reqs.append (e)
-                msg_id, pid, _ = e
+            #if len(self.queue[0][2]) == self.greater_pids[self.pid]:
+            #    e = self.queue.pop(0)
+            #    self.processed_reqs.append (e)
+            #    msg_id, pid, _ = e
                 is_set_full = True
                 
         with self.print_mutex:
@@ -173,4 +173,8 @@ class TotalOrdering:
         return '127.0.0.1:%d' % (6000 + pid)
 
     def get_all_processed_reqs(self):
-        return [(x[0], x[1]) for x in self.processed_reqs]
+        with self.__rwlock.writer_lock():
+            self.processed_reqs = [(x[0], x[1]) for x in self.queue]
+            self.queue = []
+            
+        return self.processed_reqs
