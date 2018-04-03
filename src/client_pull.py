@@ -38,6 +38,10 @@ class Client():
         return self.parse_getscore_response(r.text, to_print)
 
     def getServer(self):
+        '''
+        Query the dispatcher about the front-end server that this client needs to connect with.
+        :return:
+        '''
         if (self.server_address != ""):
             return
 
@@ -48,6 +52,10 @@ class Client():
         print "Server Address obtained", self.server_address
 
     def releaseServer(self):
+        '''
+        Voluntarily leave the server.
+        :return:
+        '''
         if (self.server_address == ""):
             print "Server not registered"
             return

@@ -8,8 +8,8 @@ import threading
 class Clock:
     def __init__(self, time_offset):
         self.current_time_offset = time_offset
-        self.delta = 10
-        self.rho = 5
+        self.delta = config.DELTA
+        self.rho = config.RHO
         self._is_leader = False
         self.clock_sync_thread = None
         self.server_addresses = None
@@ -46,6 +46,10 @@ class Clock:
         return json.dumps({"response": "success"})
 
     def get_slave_times(self):
+        '''
+        Return the average time of the slaves.
+        :return:
+        '''
         self.slave_times = []
         for addr in self.server_addresses:
             if addr != self.id:
@@ -58,6 +62,11 @@ class Clock:
         return average_time
 
     def set_slave_times(self, average_time):
+        '''
+        Set the time of the slaves.
+        :param average_time:
+        :return:
+        '''
         for addr in self.server_addresses:
             if addr != self.id:
                 r = requests.get("http://" + addr + "/setClock/" + str(average_time))
@@ -66,15 +75,23 @@ class Clock:
         print "All slaves changed with offset", average_time
 
     def set_leader(self):
+        '''
+        Set the clock to be master clock.
+        :return:
+        '''
         self._is_leader = True
         self.clock_sync_lock.acquire()
-        if (self.clock_sync_thread == None):
+        if self.clock_sync_thread is None:
             self.clock_sync_thread = utils.run_thread(self.perform_clock_sync)
         self.clock_sync_lock.release()
 
     def perform_clock_sync(self):
+        '''
+        Perform Berkley clock synchronization.
+        :return:
+        '''
         while self.is_leader():
-            if (self.server_addresses == None):
+            if self.server_addresses is None:
                 self.server_addresses = self.get_all_servers()
             print self.server_addresses
             self.set_slave_times(self.get_slave_times())
@@ -90,7 +107,7 @@ class Clock:
     def unset_leader(self):
         self._is_leader = False
         self.clock_sync_lock.acquire()
-        if (self.clock_sync_thread != None):
+        if self.clock_sync_thread is not None:
             self.clock_sync_thread.join()
             self.clock_sync_thread = None
         self.clock_sync_lock.release()
