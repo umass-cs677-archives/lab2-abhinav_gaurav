@@ -39,8 +39,8 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
 
     def call_request_handler(self, path, request):
         # try:
-        # ~ if ("getMedalTally" in path or "getScore" in path):
-        # ~ self.multicast_ordering()
+        if ("getMedalTally" in path or "getScore" in path):
+            self.multicast_ordering()
         meth, args = self.parse_request_path(path)
         return meth(*args)
         # except Exception as e:

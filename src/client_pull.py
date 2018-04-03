@@ -118,7 +118,7 @@ class Client():
 
     def start_periodic_do(self):
         self.periodic_running = True
-        self.sleeping_time = 5
+        self.sleeping_time = config.SLEEP_TIME
         self.periodic_thread = utils.run_thread(Client._periodic_do_fun, self)
 
     def _periodic_do_fun(self):
