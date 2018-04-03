@@ -1,7 +1,7 @@
 \documentclass{article}
 
 
-\usepackage[letterpaper, landscape, margin=1in]{geometry}
+\usepackage[letterpaper, margin=1in]{geometry}
 
 
 \usepackage{fancyvrb} % verbatim replacement that allows latex
@@ -10,7 +10,6 @@
 \begin{document}
 
 \section{TODO}
-. Please speccify whether your are using Python 2 or Python 3 in your design doc.
 program design 
 how it works
 possible improvements and extensions
@@ -20,10 +19,10 @@ description of tests
 We are using Python 2.
 
 \subsection{Multi Threaded Server}
-
+This implements the multithreaing support for all APIs.
 \subsection{Database}
+We have implemented REST API for Database Server
 
-Use REST API for Database Server
 \paragraph{Database Schema}
 Since clients need to know the time when the score was last updated we 
 decided to keep a json file as our database table. In order to get 
@@ -33,16 +32,21 @@ unless there is a query for same game or same team tally the database
 server would process them parallely in separate thereads and they 
 require separate locks.
 
-\subsection{Front End Server}
-
 \subsection{Dispatcher}
-Find the server with minimum number of clients connected.
+Dispatcher has all the information about number of clients registered with each front-end server and it selects the front-end server which has minimum number of clients registered to it.
 
 \subsection{Leader Election}
-happens every some seconds, specified in config file
+All the servers (front-end, database) have a thread running on them which implements the ring algorithm to elect leader. It happens every t seconds , specified in config file. A server would have to get the centralized lock implemented in dispatcher having a rest endpoint. After electing the leader it release the lock over the API.
+
 \subsection{Clock Synchronization}
-happens every Delta/(2*rho) seconds, specify in config file
+Clock Synchronization happens every Delta/(2*rho) seconds, specified in config file. It implements Berkley's Algorithm. The Master clock is the leader among the servers (front-end, database). As the leader is elected based on load, master is the most resourceful server.
+
 \subsection{Total Ordering}
+We implement the totally ordered multicasting. The test file confirms the order of elements that are popped from the queue. Confirming that the order is same across servers.
+
+
+\subsection{Front End Server}
+The Front End Server 
 
 \subsection{Combined Server}
 This server is the culmination of all 5 servers: Multi Threaded Server, 
@@ -50,5 +54,5 @@ Front End Server, Leader Election, Clock Synchronization, Total Ordering.
 Uses Multiple Inheritance to achieve this.
 
 \subsection{Client}
-
+We have designed the Client to do both forceful client-pull whenever required and periodic client-pull perpetually in the background.
 \end{document}
