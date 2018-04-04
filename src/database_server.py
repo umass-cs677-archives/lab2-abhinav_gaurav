@@ -7,7 +7,7 @@ import requests
 import utils
 import config
 import prwlock
-
+from random import randint
 
 class DatabaseHTTPServer(MultiThreadedHTTPServer, Database, LeaderElection, Clock):
     '''Multi-Threaded Database HTTP Server to handle several client requests
@@ -20,7 +20,7 @@ class DatabaseHTTPServer(MultiThreadedHTTPServer, Database, LeaderElection, Cloc
         if is_leader_election:
             LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
         if is_clock_sync:
-            Clock.__init__(self, 100, '127.0.0.1:' + str(server_addr_port[1]))
+            Clock.__init__(self, randint(1, config.DELTA), '127.0.0.1:' + str(server_addr_port[1]))
         self.disp_addr = disp_ip_addr
         self.n_requests_lock = prwlock.RWLock()
 

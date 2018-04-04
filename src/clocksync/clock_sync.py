@@ -16,6 +16,7 @@ class Clock:
         self.clock_sync_lock = threading.RLock()
         self.__thread_lock = threading.RLock()
         self.__server_id = server_id
+        print "Initial Offset of ", self.__server_id, " is ", time_offset
         
     def set_current_time_offset(self, offset):
         self.clock_sync_lock.acquire()
