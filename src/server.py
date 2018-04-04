@@ -22,6 +22,7 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
         self.addr_port = server_addr_port
         FrontEndHTTPServer.__init__(self, database_ip, database_port, disp_addr)
         MultiThreadedHTTPServer.__init__(self, server_addr_port, handler_class)
+
         if (is_leader_election):
             print "Enabling Leader Election"
             LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1])) #TODO: 
@@ -32,6 +33,7 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
         if (is_raffle):
             print "Enabling Total Ordering and Raffle"
             Raffle.__init__(self, server_count, 100)
+
         server_count += 1
 
     def get_all_servers(self):

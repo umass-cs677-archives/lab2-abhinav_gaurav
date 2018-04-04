@@ -5,7 +5,6 @@ from ..src.multitier.dispatcher import DispatcherHTTPServer
 from ..src.server import MultiThreadedFrontEndServer, ServerRequestHandler
 from ..src.multi_thread_server import create_and_run_server
 from ..src.client_pull import Client
-from ..src import utils as utils
 from ..src import config as config
 
 class TestTotalOrdering(unittest.TestCase):
@@ -43,6 +42,7 @@ class TestTotalOrdering(unittest.TestCase):
             print "server", server.get_all_processed_reqs()
         #TODO: @Gaurav, write code to check that all the lists returned from
         #server.get_all_processed_reqs() (defined in TotalOrder class) are same
+
     def __end_clients(self):
         '''Do not place this function in tearDown.'''
         for i in range(self.n_servers):
