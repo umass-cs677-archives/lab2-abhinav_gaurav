@@ -111,19 +111,16 @@ obtained from each front end server in the total multicast order. We then
 compare the two list of events obtained to make sure that each element of the 
 list is same.
 
-\begin{figure}[H]
-        \centering
-        \includegraphics[width=\textwidth]{outputs/total_ordering_test_start.png}
-        \caption{Totally ordered multicasting Start \label{fig:clong_synchronization}}
-\end{figure}
 
 \begin{figure}[H]
         \centering
         \includegraphics[width=\textwidth]{outputs/total_order_test.png}
-        \caption{Totally ordered multicasting End \label{fig:clong_synchronization}}
+        \caption{Raffle Selection}
 \end{figure}
 
-
+This can be run by executing {\tt python server.py --is\_leader\_election False --is\_clock\_sync False --is\_raffle True},
+{\tt python database\_server.py --is\_leader\_election False --is\_clock\_sync False}, and 2 clients using
+{\tt python client\_pull.py --dispatcher\_ip\_addr 127.0.0.1}.
 
 \subsection{Cases where program does not work correctly}
 We do not think that there are any such cases where our program does not work
