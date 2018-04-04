@@ -11,10 +11,7 @@ import requests
 import utils
 import config
 
-################TODO: All functions that defined in child class but not defined in parent has to be defined in parent with exception "Not Implemented"
-# TODO: Add clock offset for each server in different directory
 server_count = 0
-
 
 class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection, Clock, Raffle):
     def __init__(self, server_addr_port, handler_class, database_ip, database_port, time_offset, disp_addr,
@@ -25,10 +22,10 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
 
         if (is_leader_election):
             print "Enabling Leader Election"
-            LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1])) #TODO: 
+            LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
         if (is_clock_sync):
             print "Enabling Clock Synchronization"
-            Clock.__init__(self, time_offset, "127.0.0.1:"+str(server_addr_port[1])) #TODO: 
+            Clock.__init__(self, time_offset, "127.0.0.1:"+str(server_addr_port[1]))
         global server_count
         if (is_raffle):
             print "Enabling Total Ordering and Raffle"
@@ -38,7 +35,7 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
 
     def get_all_servers(self):
         print "get all servers " + self.disp_addr
-        r = requests.get('http://' + self.disp_addr + '/getAllServers/')  # TODO change to dispatcher port and addr
+        r = requests.get('http://' + self.disp_addr + '/getAllServers/')
         obj = utils.check_response_for_failure(r.text)
         return obj.servers
 
@@ -57,7 +54,7 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
 
     def get_all_front_end_servers(self):
         r = requests.get(
-            'http://' + self.disp_addr + '/getAllFrontEndServers/')  # TODO change to dispatcher port and addr
+            'http://' + self.disp_addr + '/getAllFrontEndServers/') 
         print r.text
         obj = utils.check_response_for_failure(r.text)
         return obj.servers

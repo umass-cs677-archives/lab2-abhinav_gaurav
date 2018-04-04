@@ -197,5 +197,5 @@ class Raffle (TotalOrdering):
         if len(all_hundreth_reqs) == 0:
             return json.dumps({"response": "success", "winner":"No Winner Yet"})
             
-        idx = int(rand_winner)%len(all_hundreth_reqs)
+        idx = int(float(rand_winner)*len(all_hundreth_reqs))
         return json.dumps({"response":"success", "winner":str(all_hundreth_reqs[idx])})

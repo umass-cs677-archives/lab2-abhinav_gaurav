@@ -25,7 +25,7 @@ class DatabaseHTTPServer(MultiThreadedHTTPServer, Database, LeaderElection, Cloc
         self.n_requests_lock = prwlock.RWLock()
 
     def get_all_servers(self):
-        r = requests.get('http://' + self.disp_ip_addr + '/getAllServers/')  # TODO change to dispatcher port and addr
+        r = requests.get('http://' + self.disp_ip_addr + '/getAllServers/')
         print r.text
         obj = utils.check_response_for_failure(r.text)
         return obj.servers
