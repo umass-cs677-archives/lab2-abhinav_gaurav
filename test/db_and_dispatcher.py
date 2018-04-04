@@ -29,7 +29,7 @@ class DatabaseAndDispatcherTests(unittest.TestCase):
         self.teams = {team: Team(team, utils.games) for team in utils.teams}
         self.cacofonix = Cacofonix("127.0.0.1", "5000")
         self.db_server, self.db_thread = create_and_run_server(DatabaseHTTPServer, ServerRequestHandler, config.DATABASE_PORT,
-                          "127.0.0.1" + ":" + str(config.DISPATCHER_PORT))
+                          "127.0.0.1" + ":" + str(config.DISPATCHER_PORT), False,  False)
 
     def test_database_locking(self):
         '''

@@ -108,7 +108,8 @@ class Clock:
   
     def end_clock_sync(self):
         self._is_leader = False
-        self.clock_sync_thread.join()
+        if (self.clock_sync_thread):
+          self.clock_sync_thread.join()
         
     def is_leader(self):
         return self._is_leader

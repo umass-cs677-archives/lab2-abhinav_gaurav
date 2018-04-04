@@ -4,6 +4,7 @@ import time
 from ..src.multitier.dispatcher import DispatcherHTTPServer
 from ..src.server import MultiThreadedFrontEndServer, ServerRequestHandler
 from ..src.multi_thread_server import create_and_run_server
+from ..src.database_server import DatabaseHTTPServer
 from ..src.client_pull import Client
 from ..src import config as config
 
@@ -20,7 +21,8 @@ class TestTotalOrdering(unittest.TestCase):
                           "127.0.0.1", config.DATABASE_PORT,
                           "127.0.0.1", self.n_servers, False, False, True, False)
         self.clients = []
-        
+        self.db_server, self.db_thread = create_and_run_server(DatabaseHTTPServer, ServerRequestHandler, config.DATABASE_PORT,
+                          "127.0.0.1" + ":" + str(config.DISPATCHER_PORT), False, True)
         for i in range(self.n_servers):
             self.clients.append(Client("127.0.0.1", "5000"))
 

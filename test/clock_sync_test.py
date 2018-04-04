@@ -26,7 +26,7 @@ class TestTotalOrdering(unittest.TestCase):
                           "127.0.0.1", self.n_servers, False, True, False, False)
         self.clients = []
         self.db_server, self.db_thread = create_and_run_server(DatabaseHTTPServer, ServerRequestHandler, config.DATABASE_PORT,
-                          "127.0.0.1" + ":" + str(config.DISPATCHER_PORT))
+                          "127.0.0.1" + ":" + str(config.DISPATCHER_PORT), False, True)
         
         
         front_end_servers = self.server.get_all_servers () + [self.db_server]
