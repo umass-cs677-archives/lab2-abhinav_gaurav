@@ -25,7 +25,6 @@ def run_command(command):
 
 
 n_clients = int(sys.argv[1])
-client_delay = float(sys.argv[2])
 n_requests = 100
 
 client_type = "pull"

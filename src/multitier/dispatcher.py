@@ -51,7 +51,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             print "Starting server %d at " % i, server_ip, port
             server, th = multi_thread_server.create_and_run_server(self.front_end_server_cls,
                                                                    multi_thread_server.ServerRequestHandler, port,
-                                                                   self.db_ip, str(self.db_port), randint(1, 100),
+                                                                   self.db_ip, str(self.db_port), randint(0, config.DELTA),
                                                                    self.full_addr,
                                                                    self.is_leader_election, self.is_clock_sync,
                                                                    self.is_total_ordering)
