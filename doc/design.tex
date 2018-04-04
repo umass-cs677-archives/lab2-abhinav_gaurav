@@ -12,16 +12,27 @@
 \section{TODO}
 program design 
 how it works
+design tradeoffs considered and made
 possible improvements and extensions
 description of tests
-
+how to run your code.
+running it on the EdLab machines
 \section{Design}
 We are using Python 2.
 
 \subsection{Multi Threaded Server}
-This implements the multithreaing support for all APIs.
+This implements the multithreaing support for all APIs. This is the base class which all the servers inherit and hence database server, front-end server, dispatcher etc. all are multithreaded.
+
 \subsection{Database}
-We have implemented REST API for Database Server
+We have exposed Database Server using REST APIs. 
+It is implemented in 'multitier/database.py'.
+Following are the endpoints that it exposes:
+\begin{itemize}
+\item query\_score\_by\_game
+\item query\_medal\_tally\_by\_team
+\item update\_score\_by\_game
+\item increment\_medal\_tally
+\end{itemize}
 
 \paragraph{Database Schema}
 Since clients need to know the time when the score was last updated we 
@@ -32,21 +43,29 @@ unless there is a query for same game or same team tally the database
 server would process them parallely in separate thereads and they 
 require separate locks.
 
+
+\subsection{Database Server}
+This is different from Database which implements/supports all the queries and the job of a server. This handles all the REST API requests and spawns a thread for each.
+
 \subsection{Dispatcher}
-Dispatcher has all the information about number of clients registered with each front-end server and it selects the front-end server which has minimum number of clients registered to it.
+This is implemented in 'src/multitier/dispatcher.py' Dispatcher has all the load information which is the number of clients registered with each front-end server and it selects the front-end server which has minimum number of clients registered to it i.e. we do load balancing. [Design Choice] The Dispatcher starts the front-end server (see create\_front\_end\_servers) and the database server. It exposes APIs required by the distributed front-end server like /getAllServers/, /getAllFrontEndServers/, /getLeaderElectionLock/, /releaseLeaderElectionLock/ for various purposes like leader election and clock synchronization. 
+It is also responsible for the raffle see start\_raffle\_thread.
 
 \subsection{Leader Election}
-All the servers (front-end, database) have a thread running on them which implements the ring algorithm to elect leader. It happens every t seconds , specified in config file. A server would have to get the centralized lock implemented in dispatcher having a rest endpoint. After electing the leader it release the lock over the API.
+
+All the servers (front-end, database) have a thread running (see perpetual\_election), which implements the ring algorithm to elect leader. It happens every t seconds , specified in config file. A server would have to get the centralized lock implemented in dispatcher having a rest endpoint. After electing the leader it release the lock over the API.
+
 
 \subsection{Clock Synchronization}
-Clock Synchronization happens every Delta/(2*rho) seconds, specified in config file. It implements Berkley's Algorithm. The Master clock is the leader among the servers (front-end, database). As the leader is elected based on load, master is the most resourceful server.
+Implemented in 'src/clocksync/clock\_sync.py'. Clock Synchronization happens every Delta/(2*rho) seconds perpetually in a thread(see def perform\_clock\_sync\_func and def perform\_clock\_sync), the constants are specified in config file. The master/leader implements Berkley's Algorithm. The Master clock is the leader among the servers (front-end, database). As the leader is elected based on load, master is the most resourceful server.
+
 
 \subsection{Total Ordering}
 We implement the totally ordered multicasting. The test file confirms the order of elements that are popped from the queue are same for all the servers. Confirming that the order is same across servers.
 
 
 \subsection{Front End Server}
-The Front End Server 
+The Front End Server implements all the APIs that are from the previous assignment. It also implements registerClient, unregisterClient which basically are for dynamically registering/unregistering clients including cacofonix. 
 
 \subsection{Combined Server}
 This server is the culmination of all 5 servers: Multi Threaded Server, 
