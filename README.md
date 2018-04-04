@@ -1,5 +1,68 @@
 
 # COMPSCI 677 Distributed and Operating Systems : Spring 2017
+## Submission
+This application has been designed for client-server communication client-pull architecture. There is a dispatcher and database layer. 
+
+Following are the details and implementations:
+* ```/src/multitier/``` directory the database and dispatcher and front-end servers.
+* ```/src/server.py``` runs the dispatcher, front-end servers and database server.
+* ```/src/cacofonix.py``` is the master score updater which updates one of the front-end server with scores.
+* ```/src/database_server.py``` is the database server.
+* ```config.py``` contains configurations for e.g. IP Address, port, protocol, authentication ID, other constants like sleep times of threads for raffle, leader election, clock synchronization.
+
+***
+
+Execution details:
+- Source
+    * dispatcher, cacofonix and database_server in src directory display the command line options with the following command ```$ python filename.py -h```.
+    * To execute dispatcher try this ```$ python server.py --n_servers 3```
+    * For cacofonix try ```$ python cacofonix.py --server_ip_addr 127.0.0.1 --server_port 5000```. Here the server is dispatcher.
+    * For client pull try ```$ python client pull.py --dispatcher_ip_addr SERVER IP ADDR --dispatcher_port SERVER PORT```
+    
+- Tests:
+    * We added 3 test files to make sure that: 
+        - clock synchronization works properly
+        - Dispatcher and Database server work properly
+        - End-to-end application works properly
+        - totally ordered multicasting which is used for raffle is also verified.
+    * Following are the instructions to run tests:
+        - Try ```$ python -m lab2.test.clock_sync_test```
+        - Try ```$ python -m lab2.test.db_and_dispatcher```
+        - Try ```$ python -m lab2.test.total_ordering_test```
+
+- Dependencies and Installation:
+    * pip install prwlock
+    * pip install requests
+
+***
+Benchmarking and Evaluation: See below and ```experiments.pdf```
+
+| Number of Clients | Latency of getScore (ms) | Latency of process getMedalTally (ms)|
+|----|----|----|
+| 5                 | 0.41                     | 0.38                                 | 
+| 8                 | 0.40                     | 0.39                                 |
+| 10                | 0.41                     | 0.38                                 |
+| 20                | 0.42                     | 0.4                                  |
+| 50                | 0.42                     | 0.42                                 |
+| 100               | 0.43                     | 0.43                                 |
+
+|Delay between requests (sec) | Latency of getScore (ms) | Latency of getMedalTally (ms)|
+|----|----|----|
+|0.01 | 0.40 | 0.40 |
+|0.05 | 0.41 | 0.42 |
+|0.1 | 0.43 | 0.43 |
+|0.5 | 0.42 | 0.44 |
+
+|Number of Clients  | Latency of each push request (ms) |
+|----|----|
+|5 | 0.01
+|10 | 0.02 | 
+|50 | 0.08 | 
+|100 | 0.16 | 
+
+
+***
+***
 
 # Programming Assignment 2: Asterix and the Olympic Games (Summer Games edition)
 
