@@ -8,6 +8,7 @@ import config
 import utils
 import json
 
+import clock_sync
 
 class LeaderElection:
     def __init__(self, server_id):
@@ -15,10 +16,17 @@ class LeaderElection:
         :param id: Server Address
         '''
         self.id = server_id
-        # TODO: check initialization and Lock needed. Never Decreases!!!
-        self.servers = []  # TODO: need to be initialized
-        utils.run_thread(self.perpetual_election)
+        self.servers = [] 
+        self.__do_leader_election = True
+        self.__leader_election_thread = utils.run_thread(self.perpetual_election)
 
+    def end_leader_election(self):
+        print"end leader eleection"
+        self.__do_leader_election = False
+        print "join thread"
+        self.__leader_election_thread.join()
+        print "thread joinned"
+        
     def get_info(self):
         '''
         To get the information needed to conduct the election.
@@ -33,15 +41,17 @@ class LeaderElection:
         Runs on a thread perpetually. Purpose: Start Election.
         :return:
         '''
-        while True:  # TODO
+        while self.__do_leader_election:  # TODO
             time.sleep(config.ELECTION_SNOOZE)
-            if not self.servers:
-                self.get_info()
-            r = requests.get('http://' + self.disp_addr + '/getLeaderElectionLock')
-            obj = utils.check_response_for_failure(r.text)
-            if obj.can_lock:
-                self.newElection()
-
+            if self.__do_leader_election:
+                if not self.servers:
+                        self.get_info()
+                r = requests.get('http://' + self.disp_addr + '/getLeaderElectionLock')
+                obj = utils.check_response_for_failure(r.text)
+                if obj.can_lock:
+                        print "start new election ", self.id
+                        self.newElection()
+        
     def coordinatorMessage(self, leader_addr):
         '''
         Pass/coordinate the leader across all servers.
@@ -50,11 +60,11 @@ class LeaderElection:
         '''
         if (leader_addr == self.id):
             print "I am the leader", leader_addr
-            self.set_leader()
-            r = requests.get('http://' + self.disp_addr + '/releaseLeaderElectionLock')
-            utils.check_response_for_failure(r.text)
+            if hasattr(self, "_Clock__thread_lock"):
+                self.set_leader()
         else:
-            self.unset_leader()
+            if hasattr(self, "_Clock__thread_lock"):
+                self.unset_leader()
             # r = requests.get(self.servers[(self.idx + 1) % len(self.servers)] + '/incrementMedalTally/%s' % (leader_addr))
             # obj = utils.check_response_for_failure(r.text)
 
@@ -63,6 +73,7 @@ class LeaderElection:
         Start a new leader.
         :return:
         '''
+        print "newelection next_server", self.next_server
         r = requests.get('http://' + self.next_server + '/passElection/%s/%d' % (self.id, self.get_load()))
         obj = utils.check_response_for_failure(r.text)
 
@@ -83,6 +94,8 @@ class LeaderElection:
             indices = [i for i, x in enumerate(loads) if x == minm]
             subset_ids = [ids[i] for i in indices]
             leader_addr = min(subset_ids)
+            r = requests.get('http://' + self.disp_addr + '/releaseLeaderElectionLock')
+            utils.check_response_for_failure(r.text)
             self.coordinatorMessage(leader_addr)
         else:  # Pass on the message
             ids.append(self.id)

@@ -17,13 +17,13 @@ class DatabaseHTTPServer(MultiThreadedHTTPServer, Database, LeaderElection, Cloc
     def __init__(self, server_addr_port, handler_class, disp_ip_addr):
         MultiThreadedHTTPServer.__init__(self, server_addr_port, handler_class)
         Database.__init__(self)
-        # LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
+        LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
         Clock.__init__(self, 100, '127.0.0.1:' + str(server_addr_port[1]))
-        self.disp_ip_addr = disp_ip_addr
+        self.disp_addr = disp_ip_addr
         self.n_requests_lock = prwlock.RWLock()
 
     def get_all_servers(self):
-        r = requests.get('http://' + self.disp_ip_addr + '/getAllServers/')
+        r = requests.get('http://' + self.disp_addr + '/getAllServers/')
         print r.text
         obj = utils.check_response_for_failure(r.text)
         return obj.servers

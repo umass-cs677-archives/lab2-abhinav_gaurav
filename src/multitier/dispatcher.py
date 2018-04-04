@@ -35,7 +35,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         self.is_clock_sync = is_clock_sync
         self.is_total_ordering = is_total_ordering
         self.is_raffle = is_raffle
-        self.lock = threading.Lock()
+        self.central_lock = threading.RLock()
         self.can_lock = True
         print "dispatcher leader election", is_leader_election
         self.create_front_end_servers(self.n_servers, self.server_ip, self.server_port)
@@ -124,26 +124,19 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         Centralized lock API for leader election lock.
         :return:
         '''
-        if not self.central_lock.acquire(wait=False):
-            return False
-        else:
-            try:
-                assert self.lock.locked() == True, "What!!?"
-                if self.can_lock:
-                    self.can_lock = False
-                    return json.dumps({"response": "success", "can_lock": True})
-                else:
-                    return json.dumps({"response": "success", "can_lock": False})
-            finally:
-                self.lock.release()
+        with self.central_lock:
+            if self.can_lock:
+                self.can_lock = False
+                return json.dumps({"response": "success", "can_lock": True})
+            else:
+                return json.dumps({"response": "success", "can_lock": False})
 
     def releaseLeaderElectionLock(self):
         '''
         API to release leader election lock.
         :return:
         '''
-        with self.lock:
-            assert self.lock.locked() == True, "What!!?"
+        with self.central_lock:
             self.can_lock = True
         return json.dumps({"response": "success"})
 

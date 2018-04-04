@@ -13,7 +13,8 @@ class Clock:
         self._is_leader = False
         self.clock_sync_thread = None
         self.server_addresses = None
-        self.clock_sync_lock = threading.RLock()  # TODO: Use two different locks
+        self.clock_sync_lock = threading.RLock()
+        self.__thread_lock = threading.RLock()
         self.__server_id = server_id
         
     def set_current_time_offset(self, offset):
@@ -86,10 +87,10 @@ class Clock:
         '''
         self._is_leader = True
         if start_clock_sync:
-            self.clock_sync_lock.acquire()
+            self.__thread_lock.acquire()
             if self.clock_sync_thread is None:
                 self.clock_sync_thread = utils.run_thread(self.perform_clock_sync)
-            self.clock_sync_lock.release()
+            self.__thread_lock.release()
 
     def perform_clock_sync_func (self):
         if self.server_addresses is None:
@@ -104,7 +105,11 @@ class Clock:
         '''
         while self.is_leader():
             self.perform_clock_sync_func ()
-
+  
+    def end_clock_sync(self):
+        self._is_leader = False
+        self.clock_sync_thread.join()
+        
     def is_leader(self):
         return self._is_leader
 
@@ -117,8 +122,8 @@ class Clock:
         :return:
         '''
         self._is_leader = False
-        self.clock_sync_lock.acquire()
+        self.__thread_lock.acquire()
         if self.clock_sync_thread is not None:
             self.clock_sync_thread.join()
             self.clock_sync_thread = None
-        self.clock_sync_lock.release()
+        self.__thread_lock.release()
