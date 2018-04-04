@@ -3,6 +3,8 @@
 ## Submission
 This application has been designed for client-server communication client-pull architecture. There is a dispatcher and database layer. 
 
+All outputs are in /doc/test_cases.pdf /doc/experiments.pdf /doc/design.pdf.
+
 Following are the details and implementations:
 * ```/src/multitier/``` directory the database and dispatcher and front-end servers.
 * ```/src/server.py``` runs the dispatcher, front-end servers and database server.
