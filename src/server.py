@@ -58,7 +58,15 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
         obj = utils.check_response_for_failure(r.text)
         return obj.servers
 
-
+    def shutdown_server(self):
+        print "shutdown server", self.addr_port
+        if hasattr(self, "_LeaderElection__leader_election_thread"):
+            self.end_leader_election()
+        if hasattr(self, "clock_sync_thread"):
+            self.end_clock_sync()
+            
+        MultiThreadedHTTPServer.shutdown_server(self)
+            
 def main():
     parser = argparse.ArgumentParser(description="MuliThreadedFrontEndServer")
     parser.add_argument('--disp_ip', type=str, default="127.0.0.1", help="Dispatcher IP")
