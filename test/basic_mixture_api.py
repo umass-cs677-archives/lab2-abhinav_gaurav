@@ -33,6 +33,10 @@ class BasicTests(unittest.TestCase):
                           "127.0.0.1" + ":" + str(config.DISPATCHER_PORT))
 
     def test_database_locking(self):
+        '''
+        Test
+        :return:
+        '''
         self.front_end_servers = self.server.get_all_servers()
 
         t = []
@@ -61,6 +65,11 @@ class BasicTests(unittest.TestCase):
                 self.assertTrue(getattr(obj.medals, key) == self.teams[team].medals[key])
 
     def test_cacofonix_to_client(self):
+        '''
+        This tests the basic functionality of the application.
+        We send update from cacofonix and test at the client.
+        :return:
+        '''
         self.cacofonix.setScore(utils.games[0], "5", "11")
         scores = self.clients[0].getScore(utils.games[0]).scores
         for team in utils.teams:
@@ -69,13 +78,42 @@ class BasicTests(unittest.TestCase):
         self.assertTrue(getattr(scores, "Gaul") == 11)
         self.assertTrue(getattr(scores, "Rome") == 5)
 
-    def load_balancing(self):
-        pass
+    def test_load_balancing(self):
+        '''
+        Test if there is load balancing or not.
+        We add more clients and see if they are distributed among front-end servers or not.
+        :return:
+        '''
+
+        self.front_end_servers = self.server.get_all_servers()
+
+        [client.getServer() for client in self.clients]
+        for idx, server in enumerate(self.front_end_servers):
+            print "The load on :", idx, server.get_load(), "Expected load:", len(self.clients)/self.n_servers
+
+
+        # increase clients hence load
+        for i in range(self.n_servers):
+            self.clients.append(Client("127.0.0.1", "5000"))
+        [client.getServer() for client in self.clients]
+        for idx, server in enumerate(self.front_end_servers):
+            print "The load on :", idx, server.get_load(), "Expected load:", len(self.clients) / self.n_servers
+            self.assertTrue(server.get_load() == len(self.clients) / self.n_servers)
+
+        # increase clients hence load
+        for i in range(self.n_servers):
+            self.clients.append(Client("127.0.0.1", "5000"))
+        [client.getServer() for client in self.clients]
+        for idx, server in enumerate(self.front_end_servers):
+            print "The load on :", idx, server.get_load(), "Expected load:", len(self.clients) / self.n_servers
+            self.assertTrue(server.get_load() == len(self.clients) / self.n_servers)
 
     def tearDown(self):
         self.db_server.shutdown()
+        self.db_server.socket.close()
         self.server.shutdown()
         self.server.shutdown_server()
+        self.server.socket.close()
         # self.server.shutdown()
         # self.server.socket.close()
         # self.server_thread.join()

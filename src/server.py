@@ -33,7 +33,7 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
         if (is_raffle):
             print "Enabling Total Ordering and Raffle"
             Raffle.__init__(self, server_count, 100)
-
+        self.is_raffle = is_raffle
         server_count += 1
 
     def get_all_servers(self):
@@ -48,7 +48,7 @@ class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, L
 
     def call_request_handler(self, path, request):
         # try:
-        if ("getMedalTally" in path or "getScore" in path):
+        if (self.is_raffle and ("getMedalTally" in path or "getScore" in path)):
             self.multicast_ordering()
         meth, args = self.parse_request_path(path)
         return meth(*args)
