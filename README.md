@@ -30,7 +30,7 @@ Execution details:
         - Try ```$ python -m lab2.test.db_and_dispatcher```
         - Try ```$ python -m lab2.test.total_ordering_test```
 
--Dependencies and Installation:
+- Dependencies and Installation:
     * pip install prwlock
     * pip install requests
 
