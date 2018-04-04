@@ -24,10 +24,10 @@ class DatabaseAndDispatcherTests(unittest.TestCase):
         self.clients = []
 
         for i in range(self.n_servers):
-            self.clients.append(Client("127.0.0.1", "5000"))
+            self.clients.append(Client("127.0.0.1", str(config.DISPATCHER_PORT)))
 
         self.teams = {team: Team(team, utils.games) for team in utils.teams}
-        self.cacofonix = Cacofonix("127.0.0.1", "5000")
+        self.cacofonix = Cacofonix("127.0.0.1", str(config.DISPATCHER_PORT))
         self.db_server, self.db_thread = create_and_run_server(DatabaseHTTPServer, ServerRequestHandler, config.DATABASE_PORT,
                           "127.0.0.1" + ":" + str(config.DISPATCHER_PORT), False,  False)
 
