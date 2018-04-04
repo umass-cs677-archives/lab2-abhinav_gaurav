@@ -12,7 +12,7 @@ from ..src import utils as utils
 from ..src.multitier.team import Team
 
 
-class BasicTests(unittest.TestCase):
+class DatabaseAndDispatcherTests(unittest.TestCase):
     def setUp(self):
         self.n_servers = 2
         self.server, self.server_thread = create_and_run_server(DispatcherHTTPServer, ServerRequestHandler,
