@@ -7,6 +7,29 @@
 \usepackage{fancyvrb} % verbatim replacement that allows latex
 \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
 
+\usepackage{url}
+% For basic math, align, fonts, etc.
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\mathtoolsset{showonlyrefs}
+
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{float}
+\usepackage{listings}
+
+% For color
+\usepackage{xcolor}
+\definecolor{dark-red}{rgb}{0.4,0.15,0.15}
+\definecolor{dark-blue}{rgb}{0,0,0.7}
+\hypersetup{
+    colorlinks, linkcolor={dark-blue},
+    citecolor={dark-blue}, urlcolor={dark-blue}
+}
+
 \begin{document}
 
 \section{Test Cases}
@@ -37,6 +60,20 @@ we create twice the number of clients as the number of servers. According
 to our scheme of load balancing, it should happen that the load on each client
 will be 2. At the end we check this. 
 
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{outputs/db_and_dispatcher_test_start.png}
+        \caption{Clock Synchronization Start \label{fig:clong_synchronization}}
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{outputs/db_and_dispatcher_test_end.png}
+        \caption{Totally ordered multicasting End \label{fig:clong_synchronization}}
+\end{figure}
+
+
 \subsection{Clock Synchronization Test}
 In this test, we ensure two main properties of clock synchronization, 
 (i) drift between each two servers is less than $\delta$, and (ii) the 
@@ -51,6 +88,18 @@ We then check that the times of each front end server matches with the internal
 offset. Moreover, we also check that time difference between each clock is
 less than $\delta$.
 
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{outputs/clock_sync_test_start.png}
+        \caption{Clock Synchronization Start \label{fig:clonk_synchronization}}
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{outputs/clock_sync_test_end.png}
+        \caption{Clock Synchronization End \label{fig:clonk_synchronization}}
+\end{figure}
+
 \subsection{Total Multicast Ordering Test}
 In this test, we ensure that the total multicast ordering is correct.
 This test resides in \texttt{test/total\_ordering\_test.py}. In this test, we
@@ -61,6 +110,19 @@ we exit the clients and shutdown the server. We then obtain all the events
 obtained from each front end server in the total multicast order. We then
 compare the two list of events obtained to make sure that each element of the 
 list is same.
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{outputs/total_ordering_test_start.png}
+        \caption{Clock Synchronization Start \label{fig:clong_synchronization}}
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{outputs/total_order_test.png}
+        \caption{Totally ordered multicasting End \label{fig:clong_synchronization}}
+\end{figure}
+
 
 
 \subsection{Cases where program does not work correctly}

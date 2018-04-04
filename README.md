@@ -35,7 +35,7 @@ Execution details:
     * pip install requests
 
 ***
-Benchmarking and Evaluation: See below and ```experiments.pdf```
+<!-- Benchmarking and Evaluation: See below and ```experiments.pdf```
 
 | Number of Clients | Latency of getScore (ms) | Latency of process getMedalTally (ms)|
 |----|----|----|
@@ -63,7 +63,7 @@ Benchmarking and Evaluation: See below and ```experiments.pdf```
 
 ***
 ***
-
+ -->
 # Programming Assignment 2: Asterix and the Olympic Games (Summer Games edition)
 
 Due: 11:55pm, Friday March 30
