@@ -1,7 +1,37 @@
+
 \documentclass{article}
+
 \usepackage{tabularx,booktabs}
+\usepackage{url}
+% For basic math, align, fonts, etc.
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\mathtoolsset{showonlyrefs}
+
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{float}
+\usepackage{listings}
+
+% For color
+\usepackage{xcolor}
+\definecolor{dark-red}{rgb}{0.4,0.15,0.15}
+\definecolor{dark-blue}{rgb}{0,0,0.7}
+\hypersetup{
+    colorlinks, linkcolor={dark-blue},
+    citecolor={dark-blue}, urlcolor={dark-blue}
+}
+
+%jupyter
+\usepackage{fancyvrb} % verbatim replacement that allows latex
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+
 
 \begin{document}
+\section{Performance Evaluation}
 We perform two experiments on our program. All experiments were performed
 on a 4-Core Intel Core i7-3610QM CPU with hyperthreading enabled and each core
 running at maximum frequency 3.30GHz. Our system was running Linux Kernel 
@@ -18,6 +48,7 @@ Results are taken for 5,8,10 number of clients.
 Table~\ref{tab:pull-request-latency} describes results for this experiment.
 We can see that the latency of 2-tier server is about 30\% more than the 
 latency of single tier server.
+
 \begin{table}
     \small
 \begin{tabularx}{\linewidth}{rccccccccccccc}
@@ -69,6 +100,7 @@ No. of Servers &Latency of each request(ms)\\
 This experiment can be performed by first starting the server by changing
 the n\_servers parameter of command {\tt python server.py --n\_servers 1} and then 
 executing command {\tt python evaluation.py 10}.
+
 \subsection{Clock Synchronization}
 For clock synchronization, our experiment is similar to the test case we used.
 Here, we set the clock offset for each front end server and database to a 
@@ -80,6 +112,7 @@ of synchronization started by server with offset 2, we get new times as
 clock synchronization. Clock synchronization can be executed by
 running dispatcher (and front end servers) by {\tt python server.py --is\_leader\_election True --is\_clock\_sync True --is\_raffle False}
 and database by {\tt python server.py --is\_leader\_election True --is\_clock\_sync True}.
+
 
 \subsection{Totally Ordered Multicast}
 This experiment is similar to the test case of totally ordered multicast.
