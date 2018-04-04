@@ -4,6 +4,7 @@ import random
 from ..src.server import MultiThreadedFrontEndServer, ServerRequestHandler, create_server
 from ..src.multi_thread_server import create_and_run_server
 from ..src.multitier.dispatcher import DispatcherHTTPServer
+from ..src.database_server import DatabaseHTTPServer
 from ..src.client_pull import Client
 from ..src.cacofonix import Cacofonix
 from ..src import config as config
@@ -27,7 +28,8 @@ class BasicTests(unittest.TestCase):
 
         self.teams = {team: Team(team, utils.games) for team in utils.teams}
         self.cacofonix = Cacofonix("127.0.0.1", "5000")
-        # self.database = create_and_run_server()     #TODO run database server
+        self.db_server, self.db_thread = create_and_run_server(DatabaseHTTPServer, ServerRequestHandler, config.DATABASE_PORT,
+                          "127.0.0.1" + ":" + str(config.DISPATCHER_PORT))
 
     def test_database_locking(self):
         '''
@@ -102,13 +104,12 @@ class BasicTests(unittest.TestCase):
             print "The load on :", idx, server.get_load(), "Expected load:", len(self.clients) / self.n_servers
             self.assertTrue(server.get_load() == len(self.clients) / self.n_servers)
 
-
-
-
-
     def tearDown(self):
+        self.db_server.shutdown()
+        self.db_server.socket.close()
         self.server.shutdown()
         self.server.shutdown_server()
+        self.server.socket.close()
         # self.server.shutdown()
         # self.server.socket.close()
         # self.server_thread.join()

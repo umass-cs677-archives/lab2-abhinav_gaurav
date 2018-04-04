@@ -10,7 +10,7 @@ import requests
 import multi_thread_server
 import time
 import config
-from random import randint
+from random import randint, random
 
 
 class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
@@ -21,8 +21,8 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
     def __init__(self, server_addr, handler_cls, front_end_server_cls, fes_port, db_ip, db_port, ip, n_servers,
                  is_leader_election, is_clock_sync, is_total_ordering, is_raffle):
         multi_thread_server.MultiThreadedHTTPServer.__init__(self, server_addr, handler_cls)
-        self.n_servers = n_servers  # TODO: command line args
-        self.server_ip = "127.0.0.1"  # TODO
+        self.n_servers = n_servers
+        self.server_ip = "127.0.0.1"
         self.server_port = fes_port
         self.mutex = threading.RLock()
         self.front_end_server_cls = front_end_server_cls
@@ -163,8 +163,9 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
     def __raffle_thread_func(self):
         while self.__raffle_running:
             time.sleep(config.RAFFLE_TIME)
-            r = requests.get(
-                'http://' + self.servers.keys()[0] + '/chooseRaffleWinner/10')  # TODO: Make this random number
+
+            r = requests.get('http://'+self.servers.keys()[0]+'/chooseRaffleWinner/%f'%(random()))
+
             obj = utils.check_response_for_failure(r.text)
             print "Winner of Raffle is", obj.winner
             for server in self.servers.keys():

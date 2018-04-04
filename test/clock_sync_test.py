@@ -62,9 +62,6 @@ class TestTotalOrdering(unittest.TestCase):
         self.db_server.shutdown()
         self.db_thread.join()
         
-        #TODO: @Gaurav, write code to check that all the lists returned from
-        #server.get_all_processed_reqs() (defined in TotalOrder class) are same
-        
     #def tearDown(self):
     #    self.server.shutdown()
     #    self.server.shutdown_server()
