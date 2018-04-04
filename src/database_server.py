@@ -1,5 +1,5 @@
 from multi_thread_server import MultiThreadedHTTPServer, create_server, set_sigint_handler, ServerRequestHandler
-from multitier.database_server import Database
+from multitier.database import Database
 from clocksync.leader_election import LeaderElection
 from clocksync.clock_sync import Clock
 import argparse

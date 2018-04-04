@@ -12,7 +12,7 @@ import time
 
 
 class FrontEndHTTPServer():
-    '''Multi-Threaded Database HTTP Server to handle several client requests
+    '''Multi-Threaded HTTP Server to handle several client requests
        concurrently.
     '''
 
@@ -67,6 +67,3 @@ class FrontEndHTTPServer():
                                                                    gaulScore, authID,
                                                                    time.time() + float(self.get_current_time_offset())))
         return r.text
-
-        # def get_current_time_offset(self):
-        #    raise NotImplemented ("FrontEndServer.get_current_time_offset Not Implemented")

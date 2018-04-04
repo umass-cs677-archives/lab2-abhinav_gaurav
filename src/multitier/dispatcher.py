@@ -107,10 +107,16 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         return json.dumps({"response": "success"})
 
     def getAllServers(self):
+        '''
+        API that returns the servers information.
+        '''
         return json.dumps(
             {"response": "success", "servers": list(self.servers.keys()) + [self.db_ip + ":" + str(self.db_port)]})
 
     def getAllFrontEndServers(self):
+        '''
+        Returns only the front-end servers
+        '''
         return json.dumps({"response": "success", "servers": list(self.servers.keys())})
 
     def getLeaderElectionLock(self):
