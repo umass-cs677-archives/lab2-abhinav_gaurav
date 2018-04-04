@@ -38,10 +38,14 @@ class TestTotalOrdering(unittest.TestCase):
         self.front_end_servers = self.server.get_all_servers ()
         print '-----------------------------------'
         print 'front end servers', self.front_end_servers
+
+        orders = []
         for server in self.front_end_servers:
             print "server", server.get_all_processed_reqs()
-        #TODO: @Gaurav, write code to check that all the lists returned from
-        #server.get_all_processed_reqs() (defined in TotalOrder class) are same
+            orders.append(str(server.get_all_processed_reqs()))
+        orders = set(orders)
+
+        self.assertTrue(len(orders) == 1, "All orders are same!")
 
     def __end_clients(self):
         '''Do not place this function in tearDown.'''
