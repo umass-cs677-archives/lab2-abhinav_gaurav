@@ -50,12 +50,23 @@ def main():
                         help='Front-end servers starting port number')
     parser.add_argument('--db_ip', type=str, default="127.0.0.1", help='Database IP Addr')
     parser.add_argument('--db_port', type=int, default=config.DATABASE_PORT, help='Database Port number')
+    parser.add_argument('--is_leader_election',type=str, default="True", help="Leader Election Enabled?")
+    parser.add_argument('--is_clock_sync',type=str, default="True", help="Clock Synchronization Enabled?")
+    
+    cmdargs = parser.parse_args()
 
+    def str2bool (s):
+        if s.lower() == "true":
+            return True
+        if s.lower() == "false":
+            return False
+        raise Exception("Invalid Argument to str2bool, '%s'"%s)
     cmdargs = parser.parse_args()
 
     # Run Database server
     httpd = create_server(DatabaseHTTPServer, ServerRequestHandler, cmdargs.db_port,
-                          "127.0.0.1" + ":" + str(cmdargs.disp_port), True, True)
+                          "127.0.0.1" + ":" + str(cmdargs.disp_port), str2bool(cmdargs.is_leader_election), 
+                          str2bool(cmdargs.is_clock_sync))
 
     set_sigint_handler(httpd)
 

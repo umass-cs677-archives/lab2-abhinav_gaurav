@@ -82,5 +82,11 @@ running dispatcher (and front end servers) by {\tt python server.py --is\_leader
 and database by {\tt python server.py --is\_leader\_election True --is\_clock\_sync True}.
 
 \subsection{Totally Ordered Multicast}
+This experiment is similar to the test case of totally ordered multicast.
+Here, we create 2 front end servers and the databse server. 2 more clients
+are created, which are registered on different servers. These clients
+continuously send several requests to their respective servers.
+Every 100th requests is stored in raffle, and after some time raffle 
+winner is randomly selected.
 
 \end{document}
