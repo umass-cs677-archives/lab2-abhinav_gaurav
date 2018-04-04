@@ -5,6 +5,7 @@ import random
 from ..src.server import MultiThreadedFrontEndServer, ServerRequestHandler, create_server
 from ..src.multi_thread_server import create_and_run_server
 from ..src.multitier.dispatcher import DispatcherHTTPServer
+from ..src.database_server import DatabaseHTTPServer
 from ..src.client_pull import Client
 from ..src.cacofonix import Cacofonix
 from ..src import config as config
@@ -28,7 +29,8 @@ class BasicTests(unittest.TestCase):
 
         self.teams = {team: Team(team, utils.games) for team in utils.teams}
         self.cacofonix = Cacofonix("127.0.0.1", "5000")
-        # self.database = create_and_run_server()     #TODO run database server
+        self.db_server, self.db_thread = create_and_run_server(DatabaseHTTPServer, ServerRequestHandler, config.DATABASE_PORT,
+                          "127.0.0.1" + ":" + str(config.DISPATCHER_PORT))
 
     def test_database_locking(self):
         self.front_end_servers = self.server.get_all_servers()
@@ -58,7 +60,7 @@ class BasicTests(unittest.TestCase):
                 #rint getattr(obj.medals, key), self.teams[team].medals[key], key
                 self.assertTrue(getattr(obj.medals, key) == self.teams[team].medals[key])
 
-    def cacofonix_to_client(self):
+    def test_cacofonix_to_client(self):
         self.cacofonix.setScore(utils.games[0], "5", "11")
         scores = self.clients[0].getScore(utils.games[0]).scores
         for team in utils.teams:
@@ -71,6 +73,7 @@ class BasicTests(unittest.TestCase):
         pass
 
     def tearDown(self):
+        self.db_server.shutdown()
         self.server.shutdown()
         self.server.shutdown_server()
         # self.server.shutdown()
