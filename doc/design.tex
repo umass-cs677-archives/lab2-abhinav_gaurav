@@ -9,15 +9,6 @@
 
 \begin{document}
 
-\section{TODO}
-program design 
-how it works
-design tradeoffs considered and made
-possible improvements and extensions
-
-
-running it on the EdLab machines
-
 \section{How to Run}
 \begin{itemize}
 \item Go to {\tt src} directory and Execute {\it \$ python server.py --n\_servers 3}. One can separately test each functionality by setting the flags --is\_leader\_election and --is\_clock\_sync and --is\_raffle. See the optional flags.
@@ -76,7 +67,7 @@ UNIX Epoch time (see /src/multitier/team.py) . In order to get  maximum throughp
 
 
 \subsection{Database Server}
-This is different from Database which implements/supports all the queries and the job of a server. This handles all the REST API requests and spawns a thread for each.
+This is different from Database which implements/supports all the queries and the job of a server. This handles all the REST API requests and spawns a thread for each. [Design choice] The database server is only one and we have optimzed it to return read queries from in-memory rather than from the json file. Write requests updates the in-memorty data structure and the database file too.
 
 \subsection{Dispatcher}
 This is implemented in 'src/multitier/dispatcher.py' Dispatcher has all the load information which is the number of clients registered with each front-end server and it selects the front-end server which has minimum number of clients registered to it i.e. we do load balancing. [Design Choice] The Dispatcher starts the front-end server (see create\_front\_end\_servers) and the database server. It assigns sequential port numbers to all the front-end servers. It exposes APIs required by the distributed front-end server like /getAllServers, /getAllFrontEndServers, /getLeaderElectionLock, /releaseLeaderElectionLock for various purposes like leader election and clock synchronization. 
@@ -114,5 +105,6 @@ It is explained in another file Test.tex and Test.pdf.
 \item There is no fault tolerance. There are potential failure cases where if the dispatcher crashes the leader election will fail because we use centralized locking.
 \item Dispatcher starts all the front-end servers and database server on the same machine. Although the code is generic in the sense that we can start front-end servers on separate machines manually and they will connect with dispatcher.
 \item For raffle one should ideally return the request to client and do the raffle process post that on a separate thread. But we run the raffle on the same thread and so the response will be a little delayed compared to the case when the raffle is conducted post the request on a different thread.
+\item We have done load balancing at front-end servers level but now the real bottleneck becomes the database server.
 \end{itemize}
 \end{document}
