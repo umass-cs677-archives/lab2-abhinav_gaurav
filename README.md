@@ -15,26 +15,24 @@ Following are the details and implementations:
 Execution details:
 - Source
     * dispatcher, cacofonix and database_server in src directory display the command line options with the following command ```$ python filename.py -h```.
-    * To execute dispatcher try this ```$ python server.py --n\_servers 3```
+    * To execute dispatcher try this ```$ python server.py --n_servers 3```
     * For cacofonix try ```$ python cacofonix.py --server_ip_addr 127.0.0.1 --server_port 5000```. Here the server is dispatcher.
     * For client pull try ```$ python client pull.py --dispatcher_ip_addr SERVER IP ADDR --dispatcher_port SERVER PORT```
     
 - Tests:
-    -We added 3 test files to make sure that: 
+    * We added 3 test files to make sure that: 
         - clock synchronization works properly
         - Dispatcher and Database server work properly
         - End-to-end application works properly
         - totally ordered multicasting which is used for raffle is also verified.
+    * Following are the instructions to run tests:
+        - Try ```$ python -m lab2.test.clock_sync_test```
+        - Try ```$ python -m lab2.test.db_and_dispatcher```
+        - Try ```$ python -m lab2.test.total_ordering_test```
 
-    - Following are the instructions to run tests:
-        * Try ```$ python -m lab2.test.clock_sync_test```
-        * Try ```$ python -m lab2.test.db_and_dispatcher```
-        * Try ```$ python -m lab2.test.total_ordering_test```
-
-
-Dependencies and Installation:
-- pip install prwlock
-- pip install requests
+-Dependencies and Installation:
+    * pip install prwlock
+    * pip install requests
 
 ***
 Benchmarking and Evaluation: See below and ```experiments.pdf```
