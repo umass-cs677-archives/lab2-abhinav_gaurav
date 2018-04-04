@@ -20,7 +20,7 @@ class DatabaseHTTPServer(MultiThreadedHTTPServer, Database, LeaderElection, Cloc
         MultiThreadedHTTPServer.__init__(self, server_addr_port, handler_class)
         Database.__init__(self)
         # LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
-        # Clock.__init__(self, 100)
+        Clock.__init__(self, 100, '127.0.0.1:' + str(server_addr_port[1]))
         self.disp_ip_addr = disp_ip_addr
         self.n_requests_lock = prwlock.RWLock()
 

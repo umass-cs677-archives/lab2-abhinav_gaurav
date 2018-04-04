@@ -17,17 +17,17 @@ server_count = 0
 
 
 class MultiThreadedFrontEndServer(FrontEndHTTPServer, MultiThreadedHTTPServer, LeaderElection, Clock, Raffle):
-    def __init__(self, server_addr_port, handler_class, database_ip, database_port, disp_addr,
+    def __init__(self, server_addr_port, handler_class, database_ip, database_port, time_offset, disp_addr,
                 is_leader_election, is_clock_sync, is_raffle):
         self.addr_port = server_addr_port
         FrontEndHTTPServer.__init__(self, database_ip, database_port, disp_addr)
         MultiThreadedHTTPServer.__init__(self, server_addr_port, handler_class)
         if (is_leader_election):
             print "Enabling Leader Election"
-            LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1]))
+            LeaderElection.__init__(self, '127.0.0.1:' + str(server_addr_port[1])) #TODO: 
         if (is_clock_sync):
             print "Enabling Clock Synchronization"
-            Clock.__init__(self, 100)
+            Clock.__init__(self, time_offset, "127.0.0.1:"+str(server_addr_port[1])) #TODO: 
         global server_count
         if (is_raffle):
             print "Enabling Total Ordering and Raffle"
