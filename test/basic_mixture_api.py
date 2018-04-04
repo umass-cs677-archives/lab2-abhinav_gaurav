@@ -30,7 +30,11 @@ class BasicTests(unittest.TestCase):
         self.cacofonix = Cacofonix("127.0.0.1", "5000")
         # self.database = create_and_run_server()     #TODO run database server
 
-    def database_locking(self):
+    def test_database_locking(self):
+        '''
+        Test
+        :return:
+        '''
         self.front_end_servers = self.server.get_all_servers()
 
         t = []
@@ -58,7 +62,12 @@ class BasicTests(unittest.TestCase):
                 #rint getattr(obj.medals, key), self.teams[team].medals[key], key
                 self.assertTrue(getattr(obj.medals, key) == self.teams[team].medals[key])
 
-    def cacofonix_to_client(self):
+    def test_cacofonix_to_client(self):
+        '''
+        This tests the basic functionality of the application.
+        We send update from cacofonix and test at the client.
+        :return:
+        '''
         self.cacofonix.setScore(utils.games[0], "5", "11")
         scores = self.clients[0].getScore(utils.games[0]).scores
         for team in utils.teams:
@@ -68,6 +77,12 @@ class BasicTests(unittest.TestCase):
         self.assertTrue(getattr(scores, "Rome") == 5)
 
     def test_load_balancing(self):
+        '''
+        Test if there is load balancing or not.
+        We add more clients and see if they are distributed among front-end servers or not.
+        :return:
+        '''
+
         self.front_end_servers = self.server.get_all_servers()
 
         [client.getServer() for client in self.clients]
