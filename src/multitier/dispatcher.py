@@ -10,6 +10,7 @@ import requests
 import multi_thread_server
 import time
 import config
+from random import randint
 
 class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
     '''Multi-Threaded Database HTTP Server to handle several client requests
@@ -45,7 +46,8 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             print "Starting server %d at " % i, server_ip, port
             server, th = multi_thread_server.create_and_run_server(self.front_end_server_cls,
                                                                    multi_thread_server.ServerRequestHandler, port,
-                                                                   self.db_ip, str(self.db_port), self.full_addr,
+                                                                   self.db_ip, str(self.db_port), randint(1, 100),
+                                                                   self.full_addr,
                                                                    self.is_leader_election, self.is_clock_sync,
                                                                    self.is_total_ordering)
             full_address = self.server_ip + ":" + str(port)
