@@ -30,7 +30,7 @@ class BasicTests(unittest.TestCase):
         self.cacofonix = Cacofonix("127.0.0.1", "5000")
         # self.database = create_and_run_server()     #TODO run database server
 
-    def test_database_locking(self):
+    def database_locking(self):
         self.front_end_servers = self.server.get_all_servers()
 
         t = []
@@ -67,8 +67,33 @@ class BasicTests(unittest.TestCase):
         self.assertTrue(getattr(scores, "Gaul") == 11)
         self.assertTrue(getattr(scores, "Rome") == 5)
 
-    def load_balancing(self):
-        pass
+    def test_load_balancing(self):
+        self.front_end_servers = self.server.get_all_servers()
+
+        [client.getServer() for client in self.clients]
+        for idx, server in enumerate(self.front_end_servers):
+            print "The load on :", idx, server.get_load(), "Expected load:", len(self.clients)/self.n_servers
+
+
+        # increase clients hence load
+        for i in range(self.n_servers):
+            self.clients.append(Client("127.0.0.1", "5000"))
+        [client.getServer() for client in self.clients]
+        for idx, server in enumerate(self.front_end_servers):
+            print "The load on :", idx, server.get_load(), "Expected load:", len(self.clients) / self.n_servers
+            self.assertTrue(server.get_load() == len(self.clients) / self.n_servers)
+
+        # increase clients hence load
+        for i in range(self.n_servers):
+            self.clients.append(Client("127.0.0.1", "5000"))
+        [client.getServer() for client in self.clients]
+        for idx, server in enumerate(self.front_end_servers):
+            print "The load on :", idx, server.get_load(), "Expected load:", len(self.clients) / self.n_servers
+            self.assertTrue(server.get_load() == len(self.clients) / self.n_servers)
+
+
+
+
 
     def tearDown(self):
         self.server.shutdown()
