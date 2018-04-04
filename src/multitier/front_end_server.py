@@ -3,10 +3,6 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(sys.modules[__name__].__file__)))
 
-import config
-import prwlock
-import time
-import multi_thread_server
 import utils
 import json
 import requests
@@ -26,14 +22,23 @@ class FrontEndHTTPServer():
         self.disp_addr = disp_addr
 
     def registerClient(self):
+        '''
+        A new client has come.
+        '''
         self.number_of_clients += 1
         return json.dumps({"response": "success"})
 
     def unregisterClient(self):
+        '''
+        Remove client.
+        '''
         self.number_of_clients -= 1
         return json.dumps({"response": "success"})
 
     def get_load(self):
+        '''
+        Load on this server.
+        '''
         return self.number_of_clients
 
     def getMedalTally(self, teamName):

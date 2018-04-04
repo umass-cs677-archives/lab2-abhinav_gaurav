@@ -1,6 +1,5 @@
 import unittest
 import random
-# import time
 
 from ..src.server import MultiThreadedFrontEndServer, ServerRequestHandler, create_server
 from ..src.multi_thread_server import create_and_run_server
@@ -32,8 +31,7 @@ class BasicTests(unittest.TestCase):
 
     def test_database_locking(self):
         '''
-        Test
-        :return:
+        Test to check if database implements locking or not. Is there any race-condition?
         '''
         self.front_end_servers = self.server.get_all_servers()
 
@@ -66,7 +64,6 @@ class BasicTests(unittest.TestCase):
         '''
         This tests the basic functionality of the application.
         We send update from cacofonix and test at the client.
-        :return:
         '''
         self.cacofonix.setScore(utils.games[0], "5", "11")
         scores = self.clients[0].getScore(utils.games[0]).scores
@@ -80,7 +77,6 @@ class BasicTests(unittest.TestCase):
         '''
         Test if there is load balancing or not.
         We add more clients and see if they are distributed among front-end servers or not.
-        :return:
         '''
 
         self.front_end_servers = self.server.get_all_servers()

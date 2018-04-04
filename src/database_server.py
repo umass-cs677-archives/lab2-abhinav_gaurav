@@ -1,6 +1,4 @@
 from multi_thread_server import MultiThreadedHTTPServer, create_server, set_sigint_handler, ServerRequestHandler
-from multitier.front_end_server import FrontEndHTTPServer
-from multitier.dispatcher import DispatcherHTTPServer
 from multitier.database_server import Database
 from clocksync.leader_election import LeaderElection
 from clocksync.clock_sync import Clock

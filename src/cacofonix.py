@@ -19,6 +19,9 @@ class Cacofonix():
         self.server_address = ""
 
     def getServer(self):
+        '''
+        The front-end server,which cacofonix should call.
+        '''
         if (self.server_address != ""):
             return
 
@@ -29,6 +32,9 @@ class Cacofonix():
         print "Server Address obtained", self.server_address
 
     def releaseServer(self):
+        '''
+        Release Server.
+        '''
         if (self.server_address == ""):
             print "Server not registered"
             return

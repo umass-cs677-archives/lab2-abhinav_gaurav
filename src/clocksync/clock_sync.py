@@ -94,7 +94,6 @@ class Clock:
     def perform_clock_sync_func (self):
         if self.server_addresses is None:
             self.server_addresses = self.get_all_servers()
-        print self.server_addresses
         self.set_slave_times(self.get_slave_times())
         time.sleep(self.delta / (2 * self.rho))
         
@@ -113,6 +112,10 @@ class Clock:
         raise NotImplemented("Clock.get_all_servers not implemented")
 
     def unset_leader(self):
+        '''
+        To give up leadership voluntarily
+        :return:
+        '''
         self._is_leader = False
         self.clock_sync_lock.acquire()
         if self.clock_sync_thread is not None:

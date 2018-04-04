@@ -12,6 +12,7 @@ import time
 import config
 from random import randint
 
+
 class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
     '''Multi-Threaded Database HTTP Server to handle several client requests
        concurrently.
@@ -29,7 +30,7 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         self.db_port = db_port
         self.full_addr = ip + ":" + str(server_addr[1])
         self.servers = {}  # Dictionary of Server addresses and number of clients associated with them
-        self.server_threads = [] #List of tuples of server objects and threads
+        self.server_threads = []  # List of tuples of server objects and threads
         self.is_leader_election = is_leader_election
         self.is_clock_sync = is_clock_sync
         self.is_total_ordering = is_total_ordering
@@ -40,8 +41,12 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         self.create_front_end_servers(self.n_servers, self.server_ip, self.server_port)
         if is_raffle:
             self.start_raffle_thread()
-            
+
     def create_front_end_servers(self, number, server_ip, port):
+        '''
+        Dispatcher creates front-end servers
+        :param number: number of servers to create
+        '''
         for i in range(0, number):
             print "Starting server %d at " % i, server_ip, port
             server, th = multi_thread_server.create_and_run_server(self.front_end_server_cls,
@@ -53,8 +58,8 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             full_address = self.server_ip + ":" + str(port)
             port += 1
             self.servers[full_address] = 0
-            self.server_threads.append ((server, th))
-        
+            self.server_threads.append((server, th))
+
     def getServer(self):
         ''' REST endpoint for getting server.
             Returns the address to server and increments the load count
@@ -80,7 +85,6 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
         r = requests.get("http://" + minload_server + "/registerClient")
         utils.check_response_for_failure(r.text)
         return json.dumps({"response": "success", "server": minload_server})
-
 
     def releaseServer(self, serveraddress):
         ''' REST Endpoint for a client to release the server. 
@@ -142,30 +146,35 @@ class DispatcherHTTPServer(multi_thread_server.MultiThreadedHTTPServer):
             server.shutdown()
             server.shutdown_server()
             th.join()
-            
+
         self.end_raffle_thread()
         multi_thread_server.MultiThreadedHTTPServer.shutdown_server(self)
-    
+
     def get_all_servers(self):
         return [x[0] for x in self.server_threads]
-    
+
     def start_raffle_thread(self):
+        '''
+        Separate thread to run raffle
+        '''
         self.__raffle_running = True
         self.raffle_thread = utils.run_thread(self.__raffle_thread_func)
-        
+
     def __raffle_thread_func(self):
         while self.__raffle_running:
             time.sleep(config.RAFFLE_TIME)
-            r = requests.get('http://'+self.servers.keys()[0]+'/chooseRaffleWinner/10') #TODO: Make this random number
+            r = requests.get(
+                'http://' + self.servers.keys()[0] + '/chooseRaffleWinner/10')  # TODO: Make this random number
             obj = utils.check_response_for_failure(r.text)
             print "Winner of Raffle is", obj.winner
             for server in self.servers.keys():
-                r = requests.get('http://'+server+"/clearReqQueue")
-                
+                r = requests.get('http://' + server + "/clearReqQueue")
+
     def end_raffle_thread(self):
         self.__raffle_running = False
         if self.is_raffle:
             self.raffle_thread.join()
-        
+
+
 if __name__ == "__main__":
     multi_thread_server.main(DispatcherHTTPServer)

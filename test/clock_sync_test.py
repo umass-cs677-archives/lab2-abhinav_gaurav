@@ -1,12 +1,9 @@
 import unittest
-import time
 
 from ..src.multitier.dispatcher import DispatcherHTTPServer
 from ..src.server import MultiThreadedFrontEndServer, ServerRequestHandler
 from ..src.database_server import DatabaseHTTPServer
 from ..src.multi_thread_server import create_and_run_server
-from ..src.client_pull import Client
-from ..src import utils as utils
 from ..src import config as config
 from random import randint
 

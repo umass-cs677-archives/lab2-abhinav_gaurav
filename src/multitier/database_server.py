@@ -5,9 +5,7 @@ sys.path.insert(0, "../")
 import utils
 import json
 import prwlock
-import time
 import team
-import multi_thread_server
 import os
 
 data_dir = "data/"

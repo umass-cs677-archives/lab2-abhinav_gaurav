@@ -20,6 +20,10 @@ class LeaderElection:
         utils.run_thread(self.perpetual_election)
 
     def get_info(self):
+        '''
+        To get the information needed to conduct the election.
+        :return:
+        '''
         self.servers = self.get_all_servers()
         self.idx = self.servers.index(self.id)
         self.next_server = self.servers[(self.idx + 1) % len(self.servers)]
@@ -38,8 +42,12 @@ class LeaderElection:
             if obj.can_lock:
                 self.newElection()
 
-
     def coordinatorMessage(self, leader_addr):
+        '''
+        Pass/coordinate the leader across all servers.
+        :param leader_addr: The address of the leader.
+        :return:
+        '''
         if (leader_addr == self.id):
             print "I am the leader", leader_addr
             self.set_leader()
@@ -51,6 +59,10 @@ class LeaderElection:
             # obj = utils.check_response_for_failure(r.text)
 
     def newElection(self):
+        '''
+        Start a new leader.
+        :return:
+        '''
         r = requests.get('http://' + self.next_server + '/passElection/%s/%d' % (self.id, self.get_load()))
         obj = utils.check_response_for_failure(r.text)
 

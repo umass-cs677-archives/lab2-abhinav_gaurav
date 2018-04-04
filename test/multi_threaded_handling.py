@@ -2,10 +2,8 @@ import unittest
 import time
 
 from ..src.server import MultiThreadedHTTPServer, ServerRequestHandler, create_server
-
 from ..src.client_pull import Client
 from ..src import utils as utils
-
 from utils import run_thread
 
 

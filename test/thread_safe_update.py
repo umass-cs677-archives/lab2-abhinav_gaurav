@@ -6,7 +6,6 @@ from ..src import utils as utils
 from ..src.cacofonix import Cacofonix
 from ..src.config import AUTH_ID
 from ..src.server import Team
-
 from utils import run_thread
 
 
